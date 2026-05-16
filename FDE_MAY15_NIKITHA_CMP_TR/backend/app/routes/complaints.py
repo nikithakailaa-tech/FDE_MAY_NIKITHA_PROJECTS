@@ -103,9 +103,38 @@ def update_complaint(
         raise HTTPException(status_code=404, detail="Complaint not found")
 
     old_status = complaint.status
+    role = current_user.role
+
+    # Role-based status transition rules
+    if data.status and data.status != old_status:
+        if role == "customer":
+            raise HTTPException(status_code=403, detail="Customers cannot change complaint status")
+
+        if role == "agent":
+            # Agent can only work on their assigned complaints
+            if complaint.agent_id != current_user.id:
+                raise HTTPException(status_code=403, detail="You can only update complaints assigned to you")
+            # If escalated, agent can pull it back to assigned to work on it
+            allowed = {
+                "open": ["in_progress"],
+                "in_progress": ["resolved", "escalated"],
+                "assigned": ["in_progress", "resolved", "escalated"],
+                "escalated": ["assigned", "in_progress"],  # agent can reclaim escalated complaint
+            }
+            if data.status not in allowed.get(old_status, []):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Agent cannot change status from '{old_status}' to '{data.status}'"
+                )
+
+        # supervisor/admin (customer support) can change any status freely
+        # including taking over escalated complaints
 
     if data.status:
         complaint.status = data.status
+        # When agent reclaims an escalated complaint, re-assign to them
+        if old_status == "escalated" and data.status == "assigned" and role == "agent":
+            complaint.agent_id = current_user.id
     if data.agent_id:
         complaint.agent_id = data.agent_id
     if data.resolution_note:
