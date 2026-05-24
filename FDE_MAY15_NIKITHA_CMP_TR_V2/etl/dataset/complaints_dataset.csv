@@ -1,0 +1,251 @@
+complaint_id,title,category,priority,status,agent,created_at,resolved_at,resolution_hours,sla_limit_hours,sla_breached
+1,Complaint #1 - Technical Issue,Technical,low,pending,Carol White,2024-05-05 07:00:00,,,72,True
+2,Complaint #2 - Delivery Issue,Delivery,low,pending,Frank Miller,2025-04-01 17:00:00,,,72,True
+3,Complaint #3 - Technical Issue,Technical,critical,open,Alice Johnson,2024-02-17 06:00:00,,,8,True
+4,Complaint #4 - Product Quality Issue,Product Quality,low,escalated,Bob Smith,2025-01-01 20:00:00,,,72,True
+5,Complaint #5 - Refund Issue,Refund,medium,closed,Eve Davis,2024-05-22 00:00:00,2024-05-22 21:00:00,21,48,False
+6,Complaint #6 - Refund Issue,Refund,high,resolved,Bob Smith,2024-04-20 10:00:00,2024-04-20 17:00:00,7,24,False
+7,Complaint #7 - Technical Issue,Technical,critical,open,Carol White,2025-03-09 11:00:00,,,8,True
+8,Complaint #8 - Customer Service Issue,Customer Service,low,pending,David Brown,2024-10-01 03:00:00,,,72,True
+9,Complaint #9 - Refund Issue,Refund,low,escalated,Carol White,2025-02-28 20:00:00,,,72,True
+10,Complaint #10 - Account Issue,Account,medium,pending,Alice Johnson,2024-01-24 21:00:00,,,48,True
+11,Complaint #11 - Product Quality Issue,Product Quality,high,open,Bob Smith,2025-03-19 03:00:00,,,24,True
+12,Complaint #12 - Refund Issue,Refund,high,closed,Frank Miller,2025-03-03 11:00:00,2025-03-03 22:00:00,11,24,False
+13,Complaint #13 - Account Issue,Account,high,in_progress,Frank Miller,2024-05-16 22:00:00,,,24,True
+14,Complaint #14 - Technical Issue,Technical,medium,escalated,Frank Miller,2024-05-05 05:00:00,,,48,True
+15,Complaint #15 - Installation Issue,Installation,critical,resolved,Frank Miller,2024-12-18 17:00:00,2024-12-19 01:00:00,8,8,False
+16,Complaint #16 - Account Issue,Account,low,in_progress,Alice Johnson,2025-02-16 10:00:00,,,72,True
+17,Complaint #17 - Refund Issue,Refund,high,open,Bob Smith,2025-04-12 18:00:00,,,24,True
+18,Complaint #18 - Account Issue,Account,medium,pending,David Brown,2024-07-21 20:00:00,,,48,True
+19,Complaint #19 - Installation Issue,Installation,medium,resolved,Bob Smith,2024-05-06 23:00:00,2024-05-09 23:00:00,72,48,True
+20,Complaint #20 - Customer Service Issue,Customer Service,critical,escalated,David Brown,2024-07-04 07:00:00,,,8,True
+21,Complaint #21 - Delivery Issue,Delivery,critical,open,Alice Johnson,2025-03-16 03:00:00,,,8,True
+22,Complaint #22 - Delivery Issue,Delivery,medium,pending,David Brown,2024-11-01 02:00:00,,,48,True
+23,Complaint #23 - Refund Issue,Refund,critical,escalated,David Brown,2024-09-27 08:00:00,,,8,True
+24,Complaint #24 - Billing Issue,Billing,low,pending,Eve Davis,2025-01-19 08:00:00,,,72,True
+25,Complaint #25 - Account Issue,Account,low,resolved,David Brown,2024-03-21 14:00:00,2024-03-21 15:00:00,1,72,False
+26,Complaint #26 - Customer Service Issue,Customer Service,medium,escalated,Alice Johnson,2025-03-21 20:00:00,,,48,True
+27,Complaint #27 - Customer Service Issue,Customer Service,medium,in_progress,Carol White,2025-01-25 05:00:00,,,48,True
+28,Complaint #28 - Billing Issue,Billing,high,closed,Alice Johnson,2024-02-27 11:00:00,2024-02-28 07:00:00,20,24,False
+29,Complaint #29 - Product Quality Issue,Product Quality,low,in_progress,Eve Davis,2025-04-29 02:00:00,,,72,True
+30,Complaint #30 - Technical Issue,Technical,critical,open,Eve Davis,2025-01-27 04:00:00,,,8,True
+31,Complaint #31 - Delivery Issue,Delivery,critical,escalated,Bob Smith,2024-05-15 16:00:00,,,8,True
+32,Complaint #32 - Refund Issue,Refund,medium,escalated,Frank Miller,2024-12-19 06:00:00,,,48,True
+33,Complaint #33 - Customer Service Issue,Customer Service,critical,pending,Frank Miller,2024-07-10 14:00:00,,,8,True
+34,Complaint #34 - Installation Issue,Installation,low,in_progress,Bob Smith,2024-02-02 10:00:00,,,72,True
+35,Complaint #35 - Billing Issue,Billing,medium,escalated,Bob Smith,2024-01-04 02:00:00,,,48,True
+36,Complaint #36 - Billing Issue,Billing,medium,open,Alice Johnson,2025-03-16 10:00:00,,,48,True
+37,Complaint #37 - Technical Issue,Technical,medium,resolved,Frank Miller,2024-09-05 06:00:00,2024-09-08 04:00:00,70,48,True
+38,Complaint #38 - Delivery Issue,Delivery,critical,in_progress,David Brown,2025-02-17 13:00:00,,,8,True
+39,Complaint #39 - Product Quality Issue,Product Quality,low,open,Frank Miller,2024-08-08 11:00:00,,,72,True
+40,Complaint #40 - Refund Issue,Refund,critical,closed,Frank Miller,2024-01-28 21:00:00,2024-01-29 01:00:00,4,8,False
+41,Complaint #41 - Billing Issue,Billing,critical,pending,Carol White,2025-02-13 03:00:00,,,8,True
+42,Complaint #42 - Product Quality Issue,Product Quality,medium,in_progress,Eve Davis,2024-08-17 04:00:00,,,48,True
+43,Complaint #43 - Refund Issue,Refund,medium,resolved,David Brown,2024-05-07 02:00:00,2024-05-09 11:00:00,57,48,True
+44,Complaint #44 - Technical Issue,Technical,low,pending,Eve Davis,2025-03-04 00:00:00,,,72,True
+45,Complaint #45 - Technical Issue,Technical,medium,in_progress,David Brown,2024-09-05 15:00:00,,,48,True
+46,Complaint #46 - Product Quality Issue,Product Quality,critical,open,Bob Smith,2024-07-13 00:00:00,,,8,True
+47,Complaint #47 - Refund Issue,Refund,high,closed,Carol White,2024-08-04 22:00:00,2024-08-06 21:00:00,47,24,True
+48,Complaint #48 - Installation Issue,Installation,medium,in_progress,Carol White,2024-04-21 01:00:00,,,48,True
+49,Complaint #49 - Billing Issue,Billing,high,open,Alice Johnson,2024-10-26 15:00:00,,,24,True
+50,Complaint #50 - Delivery Issue,Delivery,low,escalated,Alice Johnson,2025-03-11 05:00:00,,,72,True
+51,Complaint #51 - Technical Issue,Technical,low,pending,Bob Smith,2024-07-25 03:00:00,,,72,True
+52,Complaint #52 - Product Quality Issue,Product Quality,low,escalated,Alice Johnson,2024-08-02 21:00:00,,,72,True
+53,Complaint #53 - Account Issue,Account,high,in_progress,Frank Miller,2025-01-01 10:00:00,,,24,True
+54,Complaint #54 - Product Quality Issue,Product Quality,high,closed,Bob Smith,2024-12-09 20:00:00,2024-12-10 16:00:00,20,24,False
+55,Complaint #55 - Installation Issue,Installation,high,open,Alice Johnson,2024-08-22 19:00:00,,,24,True
+56,Complaint #56 - Technical Issue,Technical,low,escalated,Bob Smith,2024-09-16 08:00:00,,,72,True
+57,Complaint #57 - Delivery Issue,Delivery,high,open,Bob Smith,2024-07-08 09:00:00,,,24,True
+58,Complaint #58 - Delivery Issue,Delivery,critical,escalated,Frank Miller,2024-06-03 19:00:00,,,8,True
+59,Complaint #59 - Billing Issue,Billing,high,pending,Alice Johnson,2025-04-25 04:00:00,,,24,True
+60,Complaint #60 - Customer Service Issue,Customer Service,low,open,Frank Miller,2024-10-10 04:00:00,,,72,True
+61,Complaint #61 - Customer Service Issue,Customer Service,high,escalated,Bob Smith,2025-01-02 10:00:00,,,24,True
+62,Complaint #62 - Product Quality Issue,Product Quality,high,escalated,David Brown,2024-05-08 01:00:00,,,24,True
+63,Complaint #63 - Technical Issue,Technical,critical,resolved,Alice Johnson,2024-01-02 10:00:00,2024-01-02 15:00:00,5,8,False
+64,Complaint #64 - Customer Service Issue,Customer Service,medium,pending,David Brown,2024-10-09 22:00:00,,,48,True
+65,Complaint #65 - Refund Issue,Refund,low,open,Alice Johnson,2025-04-28 22:00:00,,,72,True
+66,Complaint #66 - Delivery Issue,Delivery,low,resolved,Eve Davis,2024-10-09 04:00:00,2024-10-13 19:00:00,111,72,True
+67,Complaint #67 - Delivery Issue,Delivery,low,resolved,Carol White,2025-04-05 01:00:00,2025-04-08 21:00:00,92,72,True
+68,Complaint #68 - Product Quality Issue,Product Quality,medium,pending,Alice Johnson,2024-06-30 17:00:00,,,48,True
+69,Complaint #69 - Refund Issue,Refund,medium,in_progress,Bob Smith,2025-05-14 05:00:00,,,48,True
+70,Complaint #70 - Refund Issue,Refund,low,in_progress,Frank Miller,2025-04-18 10:00:00,,,72,True
+71,Complaint #71 - Refund Issue,Refund,medium,resolved,Bob Smith,2025-02-07 22:00:00,2025-02-08 12:00:00,14,48,False
+72,Complaint #72 - Refund Issue,Refund,low,closed,Bob Smith,2024-04-12 14:00:00,2024-04-16 08:00:00,90,72,True
+73,Complaint #73 - Customer Service Issue,Customer Service,medium,in_progress,Alice Johnson,2024-12-03 06:00:00,,,48,True
+74,Complaint #74 - Refund Issue,Refund,high,resolved,Alice Johnson,2025-05-10 08:00:00,2025-05-11 07:00:00,23,24,False
+75,Complaint #75 - Refund Issue,Refund,high,open,Alice Johnson,2025-03-25 08:00:00,,,24,True
+76,Complaint #76 - Delivery Issue,Delivery,high,open,Alice Johnson,2024-11-01 13:00:00,,,24,True
+77,Complaint #77 - Account Issue,Account,high,closed,Eve Davis,2024-09-18 03:00:00,2024-09-19 04:00:00,25,24,True
+78,Complaint #78 - Product Quality Issue,Product Quality,high,open,Frank Miller,2024-08-11 00:00:00,,,24,True
+79,Complaint #79 - Product Quality Issue,Product Quality,high,closed,Alice Johnson,2025-04-30 21:00:00,2025-05-01 19:00:00,22,24,False
+80,Complaint #80 - Account Issue,Account,low,pending,Carol White,2024-09-16 09:00:00,,,72,True
+81,Complaint #81 - Refund Issue,Refund,high,closed,Frank Miller,2024-05-31 17:00:00,2024-06-01 02:00:00,9,24,False
+82,Complaint #82 - Product Quality Issue,Product Quality,critical,pending,David Brown,2024-12-12 23:00:00,,,8,True
+83,Complaint #83 - Delivery Issue,Delivery,high,closed,Eve Davis,2025-03-02 00:00:00,2025-03-02 20:00:00,20,24,False
+84,Complaint #84 - Customer Service Issue,Customer Service,medium,closed,Eve Davis,2024-11-06 20:00:00,2024-11-08 14:00:00,42,48,False
+85,Complaint #85 - Installation Issue,Installation,critical,closed,Frank Miller,2024-04-19 16:00:00,2024-04-20 08:00:00,16,8,True
+86,Complaint #86 - Delivery Issue,Delivery,low,resolved,Eve Davis,2024-12-05 20:00:00,2024-12-09 10:00:00,86,72,True
+87,Complaint #87 - Technical Issue,Technical,medium,pending,Carol White,2024-04-25 06:00:00,,,48,True
+88,Complaint #88 - Delivery Issue,Delivery,low,open,Bob Smith,2024-08-31 19:00:00,,,72,True
+89,Complaint #89 - Technical Issue,Technical,critical,closed,Frank Miller,2024-10-21 06:00:00,2024-10-21 19:00:00,13,8,True
+90,Complaint #90 - Installation Issue,Installation,critical,in_progress,Bob Smith,2024-12-01 22:00:00,,,8,True
+91,Complaint #91 - Billing Issue,Billing,low,closed,Bob Smith,2024-03-31 22:00:00,2024-04-06 11:00:00,133,72,True
+92,Complaint #92 - Installation Issue,Installation,low,escalated,Bob Smith,2025-04-14 03:00:00,,,72,True
+93,Complaint #93 - Installation Issue,Installation,medium,closed,Frank Miller,2024-09-28 17:00:00,2024-10-01 22:00:00,77,48,True
+94,Complaint #94 - Account Issue,Account,critical,escalated,Frank Miller,2025-04-01 16:00:00,,,8,True
+95,Complaint #95 - Refund Issue,Refund,critical,in_progress,Frank Miller,2025-03-17 15:00:00,,,8,True
+96,Complaint #96 - Installation Issue,Installation,high,in_progress,Frank Miller,2024-05-21 16:00:00,,,24,True
+97,Complaint #97 - Installation Issue,Installation,medium,resolved,David Brown,2024-02-09 22:00:00,2024-02-11 11:00:00,37,48,False
+98,Complaint #98 - Product Quality Issue,Product Quality,high,resolved,Carol White,2025-04-02 17:00:00,2025-04-02 23:00:00,6,24,False
+99,Complaint #99 - Delivery Issue,Delivery,medium,in_progress,David Brown,2024-12-21 04:00:00,,,48,True
+100,Complaint #100 - Product Quality Issue,Product Quality,low,closed,David Brown,2024-06-18 17:00:00,2024-06-23 17:00:00,120,72,True
+101,Complaint #101 - Refund Issue,Refund,low,in_progress,David Brown,2024-07-18 18:00:00,,,72,True
+102,Complaint #102 - Billing Issue,Billing,critical,closed,Alice Johnson,2025-04-27 11:00:00,2025-04-27 21:00:00,10,8,True
+103,Complaint #103 - Refund Issue,Refund,critical,escalated,Frank Miller,2025-01-11 17:00:00,,,8,True
+104,Complaint #104 - Product Quality Issue,Product Quality,critical,in_progress,Carol White,2024-08-11 15:00:00,,,8,True
+105,Complaint #105 - Billing Issue,Billing,critical,resolved,Frank Miller,2024-12-13 12:00:00,2024-12-13 18:00:00,6,8,False
+106,Complaint #106 - Installation Issue,Installation,medium,escalated,Eve Davis,2024-01-14 12:00:00,,,48,True
+107,Complaint #107 - Billing Issue,Billing,low,pending,David Brown,2024-03-10 14:00:00,,,72,True
+108,Complaint #108 - Delivery Issue,Delivery,low,resolved,David Brown,2024-06-16 06:00:00,2024-06-21 03:00:00,117,72,True
+109,Complaint #109 - Account Issue,Account,high,closed,Carol White,2025-01-20 13:00:00,2025-01-21 06:00:00,17,24,False
+110,Complaint #110 - Technical Issue,Technical,critical,open,Frank Miller,2024-10-03 01:00:00,,,8,True
+111,Complaint #111 - Account Issue,Account,medium,pending,Alice Johnson,2025-02-03 20:00:00,,,48,True
+112,Complaint #112 - Billing Issue,Billing,low,in_progress,Bob Smith,2025-03-05 00:00:00,,,72,True
+113,Complaint #113 - Delivery Issue,Delivery,medium,in_progress,David Brown,2024-12-08 03:00:00,,,48,True
+114,Complaint #114 - Product Quality Issue,Product Quality,critical,pending,Carol White,2025-01-27 11:00:00,,,8,True
+115,Complaint #115 - Delivery Issue,Delivery,low,in_progress,Carol White,2024-02-25 18:00:00,,,72,True
+116,Complaint #116 - Billing Issue,Billing,high,escalated,Frank Miller,2025-04-09 12:00:00,,,24,True
+117,Complaint #117 - Refund Issue,Refund,medium,open,Eve Davis,2024-12-19 20:00:00,,,48,True
+118,Complaint #118 - Product Quality Issue,Product Quality,low,pending,Carol White,2025-03-11 21:00:00,,,72,True
+119,Complaint #119 - Technical Issue,Technical,low,resolved,Eve Davis,2024-08-07 21:00:00,2024-08-11 20:00:00,95,72,True
+120,Complaint #120 - Technical Issue,Technical,high,open,David Brown,2025-02-25 15:00:00,,,24,True
+121,Complaint #121 - Technical Issue,Technical,critical,resolved,Frank Miller,2025-04-01 14:00:00,2025-04-01 19:00:00,5,8,False
+122,Complaint #122 - Refund Issue,Refund,medium,pending,Eve Davis,2025-05-09 20:00:00,,,48,True
+123,Complaint #123 - Customer Service Issue,Customer Service,critical,closed,David Brown,2025-02-26 23:00:00,2025-02-27 08:00:00,9,8,True
+124,Complaint #124 - Account Issue,Account,medium,open,Carol White,2025-03-27 14:00:00,,,48,True
+125,Complaint #125 - Product Quality Issue,Product Quality,critical,escalated,Eve Davis,2024-12-08 12:00:00,,,8,True
+126,Complaint #126 - Account Issue,Account,low,closed,Carol White,2024-04-03 15:00:00,2024-04-05 22:00:00,55,72,False
+127,Complaint #127 - Account Issue,Account,high,resolved,Carol White,2025-03-26 19:00:00,2025-03-28 16:00:00,45,24,True
+128,Complaint #128 - Customer Service Issue,Customer Service,low,escalated,Bob Smith,2024-02-13 07:00:00,,,72,True
+129,Complaint #129 - Refund Issue,Refund,critical,escalated,Bob Smith,2024-12-19 15:00:00,,,8,True
+130,Complaint #130 - Installation Issue,Installation,critical,open,Alice Johnson,2024-05-30 07:00:00,,,8,True
+131,Complaint #131 - Refund Issue,Refund,medium,resolved,Frank Miller,2024-10-24 11:00:00,2024-10-27 00:00:00,61,48,True
+132,Complaint #132 - Account Issue,Account,critical,pending,Eve Davis,2024-06-18 11:00:00,,,8,True
+133,Complaint #133 - Installation Issue,Installation,high,resolved,Carol White,2024-04-28 03:00:00,2024-04-30 02:00:00,47,24,True
+134,Complaint #134 - Product Quality Issue,Product Quality,high,open,Frank Miller,2024-10-01 22:00:00,,,24,True
+135,Complaint #135 - Delivery Issue,Delivery,medium,in_progress,Frank Miller,2024-09-04 08:00:00,,,48,True
+136,Complaint #136 - Customer Service Issue,Customer Service,low,in_progress,Carol White,2024-04-26 11:00:00,,,72,True
+137,Complaint #137 - Delivery Issue,Delivery,high,open,Frank Miller,2024-09-30 04:00:00,,,24,True
+138,Complaint #138 - Customer Service Issue,Customer Service,low,open,Eve Davis,2024-05-29 22:00:00,,,72,True
+139,Complaint #139 - Delivery Issue,Delivery,critical,open,Alice Johnson,2024-10-20 09:00:00,,,8,True
+140,Complaint #140 - Installation Issue,Installation,critical,closed,Carol White,2024-04-04 01:00:00,2024-04-04 10:00:00,9,8,True
+141,Complaint #141 - Installation Issue,Installation,low,open,David Brown,2024-09-08 02:00:00,,,72,True
+142,Complaint #142 - Billing Issue,Billing,medium,in_progress,Eve Davis,2025-04-30 09:00:00,,,48,True
+143,Complaint #143 - Technical Issue,Technical,medium,open,Eve Davis,2025-01-26 13:00:00,,,48,True
+144,Complaint #144 - Product Quality Issue,Product Quality,critical,closed,David Brown,2024-06-01 18:00:00,2024-06-02 08:00:00,14,8,True
+145,Complaint #145 - Customer Service Issue,Customer Service,low,escalated,Frank Miller,2024-02-20 06:00:00,,,72,True
+146,Complaint #146 - Product Quality Issue,Product Quality,high,pending,Alice Johnson,2024-03-21 07:00:00,,,24,True
+147,Complaint #147 - Delivery Issue,Delivery,low,in_progress,Alice Johnson,2024-07-28 14:00:00,,,72,True
+148,Complaint #148 - Installation Issue,Installation,high,open,Bob Smith,2024-05-27 22:00:00,,,24,True
+149,Complaint #149 - Customer Service Issue,Customer Service,critical,open,Frank Miller,2024-04-29 08:00:00,,,8,True
+150,Complaint #150 - Product Quality Issue,Product Quality,critical,open,Eve Davis,2024-04-25 20:00:00,,,8,True
+151,Complaint #151 - Delivery Issue,Delivery,high,in_progress,Alice Johnson,2024-01-31 05:00:00,,,24,True
+152,Complaint #152 - Customer Service Issue,Customer Service,high,closed,Alice Johnson,2024-08-27 22:00:00,2024-08-28 18:00:00,20,24,False
+153,Complaint #153 - Refund Issue,Refund,high,escalated,Eve Davis,2024-09-09 14:00:00,,,24,True
+154,Complaint #154 - Technical Issue,Technical,low,closed,Frank Miller,2024-06-14 19:00:00,2024-06-17 12:00:00,65,72,False
+155,Complaint #155 - Billing Issue,Billing,low,in_progress,Frank Miller,2025-03-04 18:00:00,,,72,True
+156,Complaint #156 - Billing Issue,Billing,high,escalated,Alice Johnson,2025-01-25 05:00:00,,,24,True
+157,Complaint #157 - Installation Issue,Installation,critical,resolved,Bob Smith,2024-10-26 13:00:00,2024-10-27 05:00:00,16,8,True
+158,Complaint #158 - Technical Issue,Technical,critical,resolved,David Brown,2024-06-19 10:00:00,2024-06-19 14:00:00,4,8,False
+159,Complaint #159 - Delivery Issue,Delivery,high,closed,Frank Miller,2024-09-10 09:00:00,2024-09-12 04:00:00,43,24,True
+160,Complaint #160 - Refund Issue,Refund,low,closed,Alice Johnson,2024-06-10 08:00:00,2024-06-13 19:00:00,83,72,True
+161,Complaint #161 - Technical Issue,Technical,critical,escalated,Alice Johnson,2024-12-02 17:00:00,,,8,True
+162,Complaint #162 - Installation Issue,Installation,critical,open,Bob Smith,2024-09-22 11:00:00,,,8,True
+163,Complaint #163 - Installation Issue,Installation,critical,open,Bob Smith,2024-05-16 17:00:00,,,8,True
+164,Complaint #164 - Delivery Issue,Delivery,high,closed,Frank Miller,2024-09-05 03:00:00,2024-09-05 05:00:00,2,24,False
+165,Complaint #165 - Product Quality Issue,Product Quality,medium,resolved,Eve Davis,2024-01-08 17:00:00,2024-01-10 22:00:00,53,48,True
+166,Complaint #166 - Technical Issue,Technical,medium,open,David Brown,2025-04-29 03:00:00,,,48,True
+167,Complaint #167 - Delivery Issue,Delivery,critical,pending,Carol White,2024-09-17 22:00:00,,,8,True
+168,Complaint #168 - Customer Service Issue,Customer Service,critical,closed,David Brown,2024-05-04 14:00:00,2024-05-04 19:00:00,5,8,False
+169,Complaint #169 - Refund Issue,Refund,medium,escalated,Eve Davis,2025-01-17 04:00:00,,,48,True
+170,Complaint #170 - Technical Issue,Technical,high,closed,Carol White,2025-04-23 16:00:00,2025-04-24 10:00:00,18,24,False
+171,Complaint #171 - Billing Issue,Billing,high,pending,Carol White,2025-03-04 18:00:00,,,24,True
+172,Complaint #172 - Installation Issue,Installation,medium,closed,Eve Davis,2024-09-04 11:00:00,2024-09-06 06:00:00,43,48,False
+173,Complaint #173 - Refund Issue,Refund,critical,resolved,Bob Smith,2024-12-23 07:00:00,2024-12-23 20:00:00,13,8,True
+174,Complaint #174 - Product Quality Issue,Product Quality,critical,open,Carol White,2025-01-16 15:00:00,,,8,True
+175,Complaint #175 - Refund Issue,Refund,critical,pending,Frank Miller,2024-03-18 15:00:00,,,8,True
+176,Complaint #176 - Billing Issue,Billing,medium,escalated,Eve Davis,2024-06-18 03:00:00,,,48,True
+177,Complaint #177 - Installation Issue,Installation,low,escalated,David Brown,2024-01-08 23:00:00,,,72,True
+178,Complaint #178 - Delivery Issue,Delivery,critical,pending,Bob Smith,2024-02-08 15:00:00,,,8,True
+179,Complaint #179 - Customer Service Issue,Customer Service,high,escalated,Frank Miller,2024-07-22 20:00:00,,,24,True
+180,Complaint #180 - Technical Issue,Technical,high,pending,Eve Davis,2024-07-13 10:00:00,,,24,True
+181,Complaint #181 - Installation Issue,Installation,low,escalated,Alice Johnson,2024-04-30 20:00:00,,,72,True
+182,Complaint #182 - Customer Service Issue,Customer Service,medium,pending,Alice Johnson,2024-08-10 03:00:00,,,48,True
+183,Complaint #183 - Technical Issue,Technical,critical,in_progress,Frank Miller,2024-06-02 00:00:00,,,8,True
+184,Complaint #184 - Billing Issue,Billing,high,open,Carol White,2024-07-02 11:00:00,,,24,True
+185,Complaint #185 - Refund Issue,Refund,medium,in_progress,Eve Davis,2024-07-29 18:00:00,,,48,True
+186,Complaint #186 - Delivery Issue,Delivery,medium,in_progress,Alice Johnson,2024-11-08 12:00:00,,,48,True
+187,Complaint #187 - Product Quality Issue,Product Quality,critical,escalated,Bob Smith,2024-04-28 14:00:00,,,8,True
+188,Complaint #188 - Customer Service Issue,Customer Service,critical,resolved,Frank Miller,2024-01-05 14:00:00,2024-01-06 00:00:00,10,8,True
+189,Complaint #189 - Delivery Issue,Delivery,low,closed,Carol White,2024-10-27 09:00:00,2024-10-31 22:00:00,109,72,True
+190,Complaint #190 - Customer Service Issue,Customer Service,critical,resolved,Bob Smith,2024-07-15 15:00:00,2024-07-15 19:00:00,4,8,False
+191,Complaint #191 - Product Quality Issue,Product Quality,critical,escalated,Carol White,2024-10-21 09:00:00,,,8,True
+192,Complaint #192 - Customer Service Issue,Customer Service,low,pending,David Brown,2024-05-20 00:00:00,,,72,True
+193,Complaint #193 - Billing Issue,Billing,critical,resolved,Bob Smith,2024-11-06 11:00:00,2024-11-06 19:00:00,8,8,False
+194,Complaint #194 - Product Quality Issue,Product Quality,high,pending,Frank Miller,2025-01-27 21:00:00,,,24,True
+195,Complaint #195 - Delivery Issue,Delivery,low,pending,Frank Miller,2024-01-21 09:00:00,,,72,True
+196,Complaint #196 - Installation Issue,Installation,low,escalated,Carol White,2025-01-09 04:00:00,,,72,True
+197,Complaint #197 - Technical Issue,Technical,high,resolved,Frank Miller,2024-07-31 05:00:00,2024-07-31 18:00:00,13,24,False
+198,Complaint #198 - Delivery Issue,Delivery,high,escalated,Eve Davis,2025-04-12 08:00:00,,,24,True
+199,Complaint #199 - Delivery Issue,Delivery,high,closed,Carol White,2025-01-17 10:00:00,2025-01-17 18:00:00,8,24,False
+200,Complaint #200 - Installation Issue,Installation,low,in_progress,Bob Smith,2025-03-16 21:00:00,,,72,True
+201,Complaint #201 - Refund Issue,Refund,high,open,David Brown,2024-01-08 08:00:00,,,24,True
+202,Complaint #202 - Technical Issue,Technical,critical,resolved,Frank Miller,2025-01-18 21:00:00,2025-01-19 06:00:00,9,8,True
+203,Complaint #203 - Refund Issue,Refund,high,open,Frank Miller,2024-04-29 15:00:00,,,24,True
+204,Complaint #204 - Billing Issue,Billing,high,escalated,Bob Smith,2024-11-27 02:00:00,,,24,True
+205,Complaint #205 - Installation Issue,Installation,high,pending,David Brown,2024-02-29 04:00:00,,,24,True
+206,Complaint #206 - Billing Issue,Billing,low,resolved,David Brown,2024-02-29 03:00:00,2024-03-02 16:00:00,61,72,False
+207,Complaint #207 - Delivery Issue,Delivery,critical,closed,Carol White,2024-12-09 23:00:00,2024-12-10 13:00:00,14,8,True
+208,Complaint #208 - Delivery Issue,Delivery,critical,pending,Alice Johnson,2025-03-02 15:00:00,,,8,True
+209,Complaint #209 - Refund Issue,Refund,high,open,Frank Miller,2024-07-08 06:00:00,,,24,True
+210,Complaint #210 - Installation Issue,Installation,critical,in_progress,Carol White,2024-02-20 21:00:00,,,8,True
+211,Complaint #211 - Account Issue,Account,high,open,David Brown,2024-05-21 06:00:00,,,24,True
+212,Complaint #212 - Technical Issue,Technical,critical,open,Frank Miller,2024-04-18 20:00:00,,,8,True
+213,Complaint #213 - Billing Issue,Billing,low,resolved,Bob Smith,2024-03-05 18:00:00,2024-03-07 23:00:00,53,72,False
+214,Complaint #214 - Technical Issue,Technical,medium,escalated,Bob Smith,2025-02-20 07:00:00,,,48,True
+215,Complaint #215 - Account Issue,Account,medium,escalated,Alice Johnson,2024-05-21 04:00:00,,,48,True
+216,Complaint #216 - Delivery Issue,Delivery,high,in_progress,Alice Johnson,2024-12-04 00:00:00,,,24,True
+217,Complaint #217 - Delivery Issue,Delivery,low,resolved,Bob Smith,2024-10-28 10:00:00,2024-10-28 15:00:00,5,72,False
+218,Complaint #218 - Delivery Issue,Delivery,high,open,Bob Smith,2025-01-14 13:00:00,,,24,True
+219,Complaint #219 - Technical Issue,Technical,low,closed,David Brown,2025-02-02 11:00:00,2025-02-07 23:00:00,132,72,True
+220,Complaint #220 - Technical Issue,Technical,critical,escalated,Bob Smith,2025-04-29 19:00:00,,,8,True
+221,Complaint #221 - Billing Issue,Billing,high,closed,Frank Miller,2025-05-08 00:00:00,2025-05-08 04:00:00,4,24,False
+222,Complaint #222 - Installation Issue,Installation,critical,closed,Frank Miller,2024-02-25 15:00:00,2024-02-26 06:00:00,15,8,True
+223,Complaint #223 - Technical Issue,Technical,low,resolved,Eve Davis,2024-03-16 02:00:00,2024-03-17 11:00:00,33,72,False
+224,Complaint #224 - Customer Service Issue,Customer Service,high,closed,Eve Davis,2024-09-28 09:00:00,2024-09-29 15:00:00,30,24,True
+225,Complaint #225 - Refund Issue,Refund,low,pending,Alice Johnson,2025-03-12 20:00:00,,,72,True
+226,Complaint #226 - Product Quality Issue,Product Quality,critical,closed,Bob Smith,2024-07-30 10:00:00,2024-07-31 01:00:00,15,8,True
+227,Complaint #227 - Refund Issue,Refund,critical,pending,Alice Johnson,2024-06-09 13:00:00,,,8,True
+228,Complaint #228 - Account Issue,Account,high,resolved,Bob Smith,2024-12-17 15:00:00,2024-12-17 20:00:00,5,24,False
+229,Complaint #229 - Technical Issue,Technical,low,open,David Brown,2024-02-19 23:00:00,,,72,True
+230,Complaint #230 - Account Issue,Account,medium,escalated,Alice Johnson,2024-10-27 17:00:00,,,48,True
+231,Complaint #231 - Account Issue,Account,low,closed,Carol White,2025-03-23 21:00:00,2025-03-28 10:00:00,109,72,True
+232,Complaint #232 - Billing Issue,Billing,high,escalated,Carol White,2024-06-29 03:00:00,,,24,True
+233,Complaint #233 - Product Quality Issue,Product Quality,medium,pending,David Brown,2024-04-24 03:00:00,,,48,True
+234,Complaint #234 - Account Issue,Account,high,open,Carol White,2024-10-20 07:00:00,,,24,True
+235,Complaint #235 - Refund Issue,Refund,low,escalated,Frank Miller,2025-02-28 22:00:00,,,72,True
+236,Complaint #236 - Customer Service Issue,Customer Service,low,in_progress,Carol White,2024-12-25 09:00:00,,,72,True
+237,Complaint #237 - Account Issue,Account,high,open,Bob Smith,2025-03-21 04:00:00,,,24,True
+238,Complaint #238 - Refund Issue,Refund,low,in_progress,Frank Miller,2024-11-20 00:00:00,,,72,True
+239,Complaint #239 - Technical Issue,Technical,medium,closed,David Brown,2024-08-20 10:00:00,2024-08-21 07:00:00,21,48,False
+240,Complaint #240 - Account Issue,Account,high,pending,Carol White,2025-02-01 18:00:00,,,24,True
+241,Complaint #241 - Technical Issue,Technical,low,in_progress,Bob Smith,2025-01-21 19:00:00,,,72,True
+242,Complaint #242 - Billing Issue,Billing,low,resolved,David Brown,2024-12-04 13:00:00,2024-12-09 18:00:00,125,72,True
+243,Complaint #243 - Installation Issue,Installation,critical,resolved,Bob Smith,2025-01-21 16:00:00,2025-01-21 20:00:00,4,8,False
+244,Complaint #244 - Account Issue,Account,critical,open,Carol White,2024-12-13 21:00:00,,,8,True
+245,Complaint #245 - Installation Issue,Installation,high,open,Bob Smith,2024-07-21 19:00:00,,,24,True
+246,Complaint #246 - Billing Issue,Billing,low,in_progress,Carol White,2025-04-29 06:00:00,,,72,True
+247,Complaint #247 - Delivery Issue,Delivery,high,resolved,Carol White,2024-03-02 00:00:00,2024-03-03 08:00:00,32,24,True
+248,Complaint #248 - Refund Issue,Refund,medium,in_progress,David Brown,2024-09-29 22:00:00,,,48,True
+249,Complaint #249 - Product Quality Issue,Product Quality,high,open,David Brown,2025-03-17 23:00:00,,,24,True
+250,Complaint #250 - Billing Issue,Billing,critical,open,David Brown,2025-04-16 02:00:00,,,8,True

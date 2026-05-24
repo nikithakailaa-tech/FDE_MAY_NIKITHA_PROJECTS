@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Complaint Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>Complaint Tracker</h1>
+    <div class="navbar-links">
+        <a href="/app/dashboard">Dashboard</a>
+        <a href="/app/complaints">Complaints</a>
+        <a href="/app/new-complaint">New Complaint</a>
+        <a href="/app/feedback">Feedback</a>
+        <a href="/app/reports">Reports</a>
+        <a href="/app/profile" class="active">Profile</a>
+        <a href="/app/agent-queue" id="queue-link" style="display:none">Agent Queue</a>
+        <a href="/app/escalation" id="escalation-link" style="display:none">Escalation</a>
+        <a href="/app/admin" id="admin-link" style="display:none">Admin</a>
+        <div class="notif-wrapper">
+            <button class="notif-btn" onclick="toggleNotificationDropdown()">
+                🔔<span id="notif-badge"></span>
+            </button>
+            <div id="notif-panel"></div>
+        </div>
+        <a href="#" onclick="logout()" style="margin-left:8px;">Logout</a>
+    </div>
+</nav>
+
+<div class="container" style="max-width:800px;">
+    <div class="page-header">
+        <h2>My Profile</h2>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="card" style="text-align:center;">
+        <div class="profile-avatar" id="avatar-initials">?</div>
+        <h2 id="profile-name" style="font-size:22px;margin-bottom:6px;">Loading...</h2>
+        <p id="profile-email" style="color:#666;font-size:14px;margin-bottom:12px;"></p>
+        <span id="profile-role" class="role-badge">—</span>
+        <p id="profile-joined" style="color:#aaa;font-size:12px;margin-top:12px;"></p>
+    </div>
+
+    <!-- Complaint Stats -->
+    <div class="card">
+        <h3>My Complaint Statistics</h3>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="stat-card" style="border-top-color:#1a73e8">
+                <h3 id="stat-total" style="font-size:28px;">0</h3><p>Total</p>
+            </div>
+            <div class="stat-card" style="border-top-color:#fbbc04">
+                <h3 id="stat-open" style="font-size:28px;color:#856404">0</h3><p>Open / In Progress</p>
+            </div>
+            <div class="stat-card" style="border-top-color:#34a853">
+                <h3 id="stat-resolved" style="font-size:28px;color:#2e7d32">0</h3><p>Resolved</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card">
+        <h3>Recent Complaints</h3>
+        <div id="recent-complaints">
+            <p style="color:#888;font-size:14px;">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script>
+window.onload = async function () {
+    requireAuth();
+    loadNotificationBadge();
+
+    try {
+        const me = await getMe();
+
+        if (!me || !me.name) {
+            // Token expired — force re-login
+            removeToken();
+            window.location.href = "/";
+            return;
+        }
+
+        if (me.role !== "customer") document.getElementById("queue-link").style.display = "inline";
+        if (me.role === "admin" || me.role === "supervisor") {
+            document.getElementById("admin-link").style.display = "inline";
+            document.getElementById("escalation-link").style.display = "inline";
+        }
+
+        // Avatar initials
+        const initials = me.name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+        document.getElementById("avatar-initials").textContent = initials;
+        document.getElementById("profile-name").textContent = me.name;
+        document.getElementById("profile-email").textContent = me.email;
+
+        const roleEl = document.getElementById("profile-role");
+        roleEl.textContent = me.role.charAt(0).toUpperCase() + me.role.slice(1);
+        roleEl.className = `role-badge role-${me.role}`;
+
+        if (me.created_at) {
+            document.getElementById("profile-joined").textContent = `Member since ${new Date(me.created_at).toLocaleDateString("en-US", {year:"numeric",month:"long",day:"numeric"})}`;
+        }
+
+        // Stats
+        const complaints = await getComplaints();
+        const safeComplaints = Array.isArray(complaints) ? complaints : [];
+        document.getElementById("stat-total").textContent = safeComplaints.length;
+        document.getElementById("stat-open").textContent = safeComplaints.filter(c => ["open","assigned","in_progress","pending","escalated"].includes(c.status)).length;
+        document.getElementById("stat-resolved").textContent = safeComplaints.filter(c => ["resolved","closed"].includes(c.status)).length;
+
+        // Recent
+        const recent = safeComplaints.slice(0, 5);
+        if (!recent.length) {
+            document.getElementById("recent-complaints").innerHTML = `<p style="color:#888;font-size:14px;">No complaints yet.</p>`;
+        } else {
+            document.getElementById("recent-complaints").innerHTML = `
+                <table>
+                    <thead><tr><th>ID</th><th>Title</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody>
+                    ${recent.map(c => `
+                        <tr>
+                            <td><strong>${c.complaint_number}</strong></td>
+                            <td>${c.title}</td>
+                            <td><span class="badge badge-${c.priority}">${c.priority}</span></td>
+                            <td><span class="badge badge-${c.status}">${c.status.replace("_"," ")}</span></td>
+                            <td style="font-size:12px;color:#888;">${new Date(c.created_at).toLocaleDateString()}</td>
+                        </tr>
+                    `).join("")}
+                    </tbody>
+                </table>`;
+        }
+
+    } catch (err) {
+        document.getElementById("profile-name").textContent = "Error loading profile";
+        document.getElementById("avatar-initials").textContent = "!";
+        console.error("Profile load error:", err);
+    }
+};
+</script>
+</body>
+</html>

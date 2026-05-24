@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Reports - Complaint Tracker v2</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .analytics-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+        .summary-card{background:#fff;border-radius:12px;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);border-top:4px solid #16a34a;}
+        .summary-card h2{font-size:2rem;margin:0 0 6px;color:#16a34a;}
+        .summary-card p{margin:0;color:#555;font-size:14px;}
+        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;}
+        .chart-card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+        .chart-card h3{margin:0 0 16px;font-size:16px;color:#1e293b;}
+        .table-wrap{overflow-x:auto;margin-top:28px;}
+        .data-table{width:100%;border-collapse:collapse;font-size:13px;}
+        .data-table th{background:#f1f5f9;padding:10px 14px;text-align:left;border-bottom:2px solid #e2e8f0;color:#475569;font-weight:600;}
+        .data-table td{padding:10px 14px;border-bottom:1px solid #f1f5f9;}
+        .data-table tr:hover td{background:#f8fafc;}
+        .badge-breach{background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
+        .badge-ok{background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
+        .etl-banner{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px;font-size:13px;color:#1e40af;}
+        .section-title{font-size:16px;font-weight:700;color:#1e293b;margin:28px 0 12px;}
+        @media(max-width:900px){.analytics-summary{grid-template-columns:1fr 1fr;}.charts-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>Complaint Tracker <span style="font-size:12px;background:#16a34a;color:#fff;padding:2px 8px;border-radius:99px;vertical-align:middle;">v2</span></h1>
+    <div class="navbar-links">
+        <a href="/app/dashboard">Dashboard</a>
+        <a href="/app/complaints">Complaints</a>
+        <a href="/app/new-complaint">New Complaint</a>
+        <a href="/app/feedback">Feedback</a>
+        <a href="/app/reports" class="active">Reports</a>
+        <a href="/app/profile">Profile</a>
+        <a href="/app/agent-queue" id="queue-link" style="display:none">Agent Queue</a>
+        <a href="/app/escalation" id="escalation-link" style="display:none">Escalation</a>
+        <a href="/app/admin" id="admin-link" style="display:none">Admin</a>
+        <div class="notif-wrapper">
+            <button class="notif-btn" onclick="toggleNotificationDropdown()">&#128276;<span id="notif-badge"></span></button>
+            <div id="notif-panel"></div>
+        </div>
+        <a href="#" onclick="logout()" style="margin-left:8px;">Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h2>Analytics Reports &mdash; Phase 2 ETL</h2>
+        <button class="btn btn-primary" style="width:auto" onclick="refreshAll()">&#8635; Refresh Data</button>
+    </div>
+
+    <div class="etl-banner">
+        <span style="font-size:20px;">&#9432;</span>
+        <span>Data sourced from ETL pipeline &mdash; <strong>250 complaint records</strong> extracted, transformed &amp; loaded into the analytics database.</span>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="analytics-summary">
+        <div class="summary-card">
+            <h2 id="s-total">—</h2><p>Total Records</p>
+        </div>
+        <div class="summary-card" style="border-top-color:#dc2626">
+            <h2 id="s-breached" style="color:#dc2626">—</h2><p>SLA Breached</p>
+        </div>
+        <div class="summary-card" style="border-top-color:#1a73e8">
+            <h2 id="s-categories" style="color:#1a73e8">—</h2><p>Categories</p>
+        </div>
+        <div class="summary-card" style="border-top-color:#f59e0b">
+            <h2 id="s-agents" style="color:#f59e0b">—</h2><p>Agents Tracked</p>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>&#9888; SLA Breach Rate by Category</h3>
+            <canvas id="slaChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>&#128202; Complaints by Category</h3>
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>&#128200; Monthly Complaint Trends (Last 18 Months)</h3>
+            <canvas id="trendChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>&#128100; Agent Performance</h3>
+            <canvas id="agentChart"></canvas>
+        </div>
+    </div>
+
+    <!-- SLA Detail Table -->
+    <p class="section-title">SLA Breach Detail &mdash; by Category &amp; Priority</p>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr>
+                <th>Category</th><th>Priority</th><th>Total</th><th>Breached</th><th>Breach Rate</th><th>Risk Level</th>
+            </tr></thead>
+            <tbody id="sla-tbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">Loading...</td></tr></tbody>
+        </table>
+    </div>
+
+    <!-- Agent Detail Table -->
+    <p class="section-title">Agent Performance Detail</p>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr>
+                <th>Agent</th><th>Assigned</th><th>Resolved</th><th>Resolution Rate</th><th>Avg Resolution (hrs)</th><th>SLA Breached</th>
+            </tr></thead>
+            <tbody id="agent-tbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">Loading...</td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script>
+const COLORS = ["#1a73e8","#34a853","#ea4335","#fbbc04","#ab47bc","#00acc1","#ff7043","#8d6e63"];
+
+let charts = {};
+
+window.onload = async function () {
+    requireAuth();
+    loadNotificationBadge();
+    const me = await getMe();
+    if (me.role !== "customer") document.getElementById("queue-link").style.display = "inline";
+    if (me.role === "admin" || me.role === "supervisor") {
+        document.getElementById("admin-link").style.display = "inline";
+        document.getElementById("escalation-link").style.display = "inline";
+    }
+    await loadAll();
+};
+
+async function fetchAnalytics(endpoint) {
+    const res = await fetch(`${API_URL}/analytics/${endpoint}`, { headers: authHeaders() });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+}
+
+async function loadAll() {
+    try {
+        const [summary, slaData, catData, trendData, agentData] = await Promise.all([
+            fetchAnalytics("summary"),
+            fetchAnalytics("sla-breach"),
+            fetchAnalytics("category-analysis"),
+            fetchAnalytics("monthly-trends"),
+            fetchAnalytics("agent-performance")
+        ]);
+        renderSummary(summary);
+        renderSLAChart(slaData);
+        renderCategoryChart(catData);
+        renderTrendChart(trendData);
+        renderAgentChart(agentData);
+        renderSLATable(slaData.by_category_priority);
+        renderAgentTable(agentData);
+    } catch(e) {
+        console.error("Analytics error:", e);
+        document.querySelector(".etl-banner").innerHTML =
+            '<span style="color:#dc2626;font-weight:600;">&#9888; ' + e.message + '</span>';
+    }
+}
+
+function renderSummary(d) {
+    document.getElementById("s-total").textContent      = d.total_records;
+    document.getElementById("s-breached").textContent   = d.sla_breached;
+    document.getElementById("s-categories").textContent = d.categories;
+    document.getElementById("s-agents").textContent     = d.agents;
+}
+
+function renderSLAChart(data) {
+    const rows = data.by_category_priority;
+    const catMap = {};
+    rows.forEach(r => {
+        if (!catMap[r.category]) catMap[r.category] = {total:0, breached:0};
+        catMap[r.category].total   += r.total;
+        catMap[r.category].breached += r.breached;
+    });
+    const labels = Object.keys(catMap);
+    const rates  = labels.map(c => Math.round(catMap[c].breached * 100 / catMap[c].total));
+    if (charts.sla) charts.sla.destroy();
+    charts.sla = new Chart(document.getElementById("slaChart"), {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [{
+                label: "Breach Rate (%)",
+                data: rates,
+                backgroundColor: rates.map(r => r > 70 ? "#ea4335" : r > 40 ? "#fbbc04" : "#34a853"),
+                borderRadius: 6
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero:true, max:100, ticks:{ callback: v => v+"%" } } },
+            plugins: { legend:{ display:false } }
+        }
+    });
+}
+
+function renderCategoryChart(rows) {
+    if (charts.category) charts.category.destroy();
+    charts.category = new Chart(document.getElementById("categoryChart"), {
+        type: "doughnut",
+        data: {
+            labels: rows.map(r => r.category),
+            datasets: [{ data: rows.map(r => r.total), backgroundColor: COLORS, borderWidth:2 }]
+        },
+        options: { plugins:{ legend:{ position:"bottom" } }, cutout:"55%" }
+    });
+}
+
+function renderTrendChart(rows) {
+    if (charts.trend) charts.trend.destroy();
+    charts.trend = new Chart(document.getElementById("trendChart"), {
+        type: "line",
+        data: {
+            labels: rows.map(r => r.month_label),
+            datasets: [
+                { label:"Total",    data:rows.map(r=>r.total),    borderColor:"#1a73e8", backgroundColor:"rgba(26,115,232,.1)", tension:.4, fill:true, pointRadius:4 },
+                { label:"Resolved", data:rows.map(r=>r.resolved), borderColor:"#34a853", backgroundColor:"rgba(52,168,83,.08)", tension:.4, fill:true, pointRadius:4 },
+                { label:"Breached", data:rows.map(r=>r.breached), borderColor:"#ea4335", backgroundColor:"rgba(234,67,53,.07)", tension:.4, fill:true, pointRadius:4 }
+            ]
+        },
+        options: {
+            scales: { y:{ beginAtZero:true, ticks:{ stepSize:1 } } },
+            plugins: { legend:{ position:"bottom" } }
+        }
+    });
+}
+
+function renderAgentChart(rows) {
+    if (charts.agent) charts.agent.destroy();
+    charts.agent = new Chart(document.getElementById("agentChart"), {
+        type: "bar",
+        data: {
+            labels: rows.map(r => r.agent),
+            datasets: [
+                { label:"Assigned",    data:rows.map(r=>r.assigned),    backgroundColor:"#1a73e8", borderRadius:4 },
+                { label:"Resolved",    data:rows.map(r=>r.resolved),    backgroundColor:"#34a853", borderRadius:4 },
+                { label:"SLA Breached",data:rows.map(r=>r.sla_breached),backgroundColor:"#ea4335", borderRadius:4 }
+            ]
+        },
+        options: {
+            scales: { y:{ beginAtZero:true, ticks:{ stepSize:1 } } },
+            plugins: { legend:{ position:"bottom" } }
+        }
+    });
+}
+
+function renderSLATable(rows) {
+    const tbody = document.getElementById("sla-tbody");
+    tbody.innerHTML = rows.map(r => `
+        <tr>
+            <td>${r.category}</td>
+            <td><span class="severity-badge severity-${r.priority}">${r.priority}</span></td>
+            <td>${r.total}</td>
+            <td>${r.breached}</td>
+            <td><strong>${r.breach_rate}%</strong></td>
+            <td><span class="${r.breach_rate > 50 ? 'badge-breach':'badge-ok'}">${r.breach_rate > 50 ? 'High Risk':'Acceptable'}</span></td>
+        </tr>`).join("");
+}
+
+function renderAgentTable(rows) {
+    const tbody = document.getElementById("agent-tbody");
+    tbody.innerHTML = rows.map(r => `
+        <tr>
+            <td><strong>${r.agent}</strong></td>
+            <td>${r.assigned}</td>
+            <td>${r.resolved}</td>
+            <td>${r.resolution_rate}%</td>
+            <td>${r.avg_resolution_hours ? r.avg_resolution_hours + "h" : "—"}</td>
+            <td><span class="${r.sla_breached > 10 ? 'badge-breach':'badge-ok'}">${r.sla_breached}</span></td>
+        </tr>`).join("");
+}
+
+async function refreshAll() {
+    document.getElementById("sla-tbody").innerHTML   = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#999;">Refreshing...</td></tr>';
+    document.getElementById("agent-tbody").innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#999;">Refreshing...</td></tr>';
+    await loadAll();
+}
+</script>
+</body>
+</html>
