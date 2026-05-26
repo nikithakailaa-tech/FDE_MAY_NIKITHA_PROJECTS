@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Trip Planner ✈️</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+<style>
+  /* ── Flatpickr overrides ── */
+  .flatpickr-calendar { font-family: 'Poppins', sans-serif !important; border-radius: 16px !important; box-shadow: 0 20px 60px rgba(0,0,0,.18) !important; border: 1px solid rgba(0,153,204,.2) !important; overflow: hidden; }
+  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: #0099CC !important; border-color: #0099CC !important; }
+  .flatpickr-day.inRange { background: rgba(0,153,204,.15) !important; border-color: rgba(0,153,204,.1) !important; color: #0a3d62 !important; }
+  .flatpickr-day:hover { background: rgba(0,153,204,.12) !important; }
+  .flatpickr-months .flatpickr-month { background: #0099CC !important; color: #fff !important; }
+  .flatpickr-current-month, .flatpickr-monthDropdown-months, .flatpickr-current-month .numInputWrapper input { color: #fff !important; }
+  .flatpickr-weekday { color: rgba(255,255,255,.8) !important; background: #0099CC !important; }
+  .flatpickr-prev-month, .flatpickr-next-month { color: #fff !important; fill: #fff !important; }
+  .date-range-wrap { display: flex; gap: 10px; }
+  .date-input-box { flex: 1; position: relative; }
+  .date-input-box input { padding-right: 36px !important; cursor: pointer; }
+  .date-cal-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; opacity: .6; }
+</style>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --sun: #FF6B35;
+    --ocean: #0099CC;
+    --sky: #87CEEB;
+    --sand: #FFF8E7;
+    --palm: #2ECC71;
+    --sunset: #FF8C42;
+    --coral: #FF4F7B;
+    --deep: #0A3D62;
+    --white: #FFFFFF;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    overflow: hidden;
+    height: 340px;
+  }
+  header svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .header-inner {
+    position: relative; z-index: 2;
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 32px;
+    height: 100%;
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    gap: 0;
+  }
+
+  .header-eyebrow {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 30px;
+    padding: 5px 14px;
+    margin-bottom: 14px;
+  }
+  .header-eyebrow span { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: .6px; text-transform: uppercase; }
+  .header-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; animation: blink-dot 1.8s ease-in-out infinite; }
+  @keyframes blink-dot { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+  .header-logo {
+    display: none;
+  }
+
+  header h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    margin: 0 0 4px;
+  }
+
+  .header-tagline {
+    font-size: clamp(14px, 2vw, 18px);
+    color: rgba(255,255,255,0.85);
+    font-weight: 400;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    margin: 6px 0 20px;
+    letter-spacing: .2px;
+  }
+
+  .header-badges {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.14);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.92);
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 1200px; margin: -20px auto 0;
+    padding: 0 24px 48px;
+    display: grid; grid-template-columns: 420px 1fr; gap: 24px;
+  }
+  @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.9);
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700; color: var(--ocean);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sun), var(--coral));
+  }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .full { grid-column: 1 / -1; }
+
+  label {
+    display: block; font-size: 11px; font-weight: 600;
+    color: var(--muted); margin-bottom: 5px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+
+  input, select {
+    width: 100%;
+    background: #f8fafc;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--ocean);
+    box-shadow: 0 0 0 3px rgba(0,153,204,0.12);
+    background: white;
+  }
+  input::placeholder { color: #c0c9d4; }
+
+  /* ── INTERESTS ── */
+  .interests { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .interest-btn {
+    background: #f1f5f9;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: 12px; font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+    font-family: inherit;
+  }
+  .interest-btn.active {
+    background: linear-gradient(135deg, #FF6B35, #FF4F7B);
+    border-color: transparent;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(255,107,53,0.35);
+  }
+  .interest-btn:hover:not(.active) { border-color: var(--ocean); color: var(--ocean); }
+
+  /* ── PLAN BUTTON ── */
+  .btn-plan {
+    width: 100%;
+    background: linear-gradient(135deg, #FF6B35 0%, #FF4F7B 50%, #0099CC 100%);
+    border: none; border-radius: 12px; padding: 15px;
+    color: white; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    margin-top: 20px;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(255,107,53,0.4);
+    letter-spacing: 0.3px;
+  }
+  .btn-plan:hover  { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.4); }
+  .btn-plan:active { transform: translateY(0); }
+  .btn-plan:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel { display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── PIPELINE ── */
+  .pipeline { display: flex; flex-direction: column; gap: 8px; }
+  .agent-step {
+    display: flex; align-items: center; gap: 12px;
+    background: #f8fafc; border-radius: 12px; padding: 12px 16px;
+    border-left: 3px solid #e2e8f0;
+    transition: all 0.3s;
+  }
+  .agent-step.running {
+    border-left-color: var(--sunset);
+    background: linear-gradient(90deg, #fff8f0, #f8fafc);
+  }
+  .agent-step.done {
+    border-left-color: var(--palm);
+    background: linear-gradient(90deg, #f0fdf4, #f8fafc);
+  }
+  .agent-step.error { border-left-color: var(--coral); }
+  .step-icon { font-size: 18px; width: 26px; text-align: center; }
+  .step-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+  .step-status { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .agent-step.done .step-status    { color: var(--palm); }
+  .agent-step.running .step-status { color: var(--sunset); }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid #fde68a;
+    border-top-color: var(--sunset);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESULTS ── */
+  .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .result-box {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 12px; padding: 14px 16px;
+    border: 1px solid #e5e7eb;
+  }
+  .result-box .rb-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    font-weight: 600; margin-bottom: 5px;
+  }
+  .result-box .rb-value { font-size: 14px; font-weight: 700; color: var(--text); }
+  .result-box .rb-value.green { color: var(--palm); }
+  .result-box .rb-value.red   { color: var(--coral); }
+  .result-box .rb-value.amber { color: var(--sunset); }
+
+  /* ── EVALUATION SCORECARD ── */
+  .eval-card { background: linear-gradient(135deg,#0a1628 0%,#0d2240 100%); border: 1px solid rgba(255,180,0,.25); border-radius: 16px; padding: 20px; margin-top: 16px; }
+  .eval-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .eval-title { font-size: 13px; font-weight: 700; color: #aac; letter-spacing: .05em; text-transform: uppercase; }
+  .eval-score-ring { width: 72px; height: 72px; position: relative; }
+  .eval-score-ring svg { transform: rotate(-90deg); }
+  .eval-score-ring .ring-bg  { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 6; }
+  .eval-score-ring .ring-val { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset .8s ease; }
+  .eval-score-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .eval-score-num  { font-size: 20px; font-weight: 800; color: #fff; line-height: 1; }
+  .eval-score-max  { font-size: 9px;  color: #778; }
+  .eval-grade { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .grade-excellent { background: rgba(0,200,100,.15); color: #00c864; border: 1px solid rgba(0,200,100,.3); }
+  .grade-good      { background: rgba(0,180,255,.15); color: #00b4ff; border: 1px solid rgba(0,180,255,.3); }
+  .grade-fair      { background: rgba(255,180,0,.15);  color: #ffb400; border: 1px solid rgba(255,180,0,.3); }
+  .grade-poor      { background: rgba(255,80,80,.15);  color: #ff5050; border: 1px solid rgba(255,80,80,.3); }
+  .eval-bars { display: flex; flex-direction: column; gap: 8px; }
+  .eval-row { display: flex; align-items: center; gap: 8px; }
+  .eval-row-label { font-size: 11px; color: #89a; width: 110px; flex-shrink: 0; }
+  .eval-row-bar-wrap { flex: 1; background: rgba(255,255,255,.06); border-radius: 4px; height: 7px; overflow: hidden; }
+  .eval-row-bar { height: 100%; border-radius: 4px; transition: width .7s ease; }
+  .eval-row-pts { font-size: 11px; font-weight: 700; color: #cce; width: 36px; text-align: right; flex-shrink: 0; }
+  .eval-row-note { font-size: 10px; color: #667; margin-left: 2px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .eval-recs { margin-top: 14px; border-top: 1px solid rgba(255,255,255,.06); padding-top: 12px; }
+  .eval-recs-title { font-size: 11px; color: #89a; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+  .eval-rec { font-size: 11px; color: #aac; padding: 4px 0; padding-left: 14px; position: relative; }
+  .eval-rec::before { content: "→"; position: absolute; left: 0; color: #ffb400; }
+  .guardrail-warn { background: rgba(255,180,0,.10); border: 1px solid rgba(255,180,0,.3); border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 12px; color: #ffb400; }
+
+  /* ── DETAIL CARDS ── */
+  .detail-card { background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.07); padding: 20px; margin-top: 16px; }
+  .detail-card-title { font-size: 15px; font-weight: 700; color: var(--deep); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .detail-card-title .badge-live { font-size: 9px; background: rgba(0,200,100,.12); color: #00a854; border: 1px solid rgba(0,200,100,.3); border-radius: 20px; padding: 2px 8px; font-weight: 600; }
+
+  /* transport */
+  .transport-option { border: 1px solid #e5e9ef; border-radius: 12px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; transition: border-color .2s; }
+  .transport-option:hover { border-color: var(--ocean); }
+  .transport-option.recommended { border-color: var(--ocean); background: rgba(0,153,204,.04); }
+  .transport-mode-icon { font-size: 26px; line-height: 1; flex-shrink: 0; }
+  .transport-body { flex: 1; }
+  .transport-name { font-size: 13px; font-weight: 700; color: var(--deep); }
+  .transport-detail { font-size: 11px; color: #667; margin-top: 4px; line-height: 1.6; }
+  .transport-price { font-size: 14px; font-weight: 800; color: var(--ocean); text-align: right; flex-shrink: 0; }
+  .rec-chip { display: inline-block; font-size: 9px; background: var(--ocean); color: #fff; border-radius: 20px; padding: 2px 8px; margin-left: 6px; font-weight: 600; }
+  .boarding-alert { background: linear-gradient(135deg,#fff8e1,#fff3cd); border: 1px solid #ffc107; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; }
+  .boarding-alert .ba-title { font-size: 12px; font-weight: 700; color: #856404; margin-bottom: 4px; }
+  .boarding-alert .ba-body  { font-size: 11px; color: #664d03; line-height: 1.6; }
+  .boarding-alert .ba-transfer { margin-top: 6px; font-size: 11px; color: #0a3d62; background: rgba(0,153,204,.08); border-radius: 8px; padding: 5px 10px; display: inline-block; }
+  .boarding-note-tag { font-size: 10px; background: #fff3cd; color: #856404; border: 1px solid #ffc107; border-radius: 20px; padding: 2px 8px; margin-top: 4px; display: inline-block; }
+  .hub-ask-box { background: linear-gradient(135deg,#e8f4fd,#dbeafe); border: 1px solid #93c5fd; border-radius: 14px; padding: 14px 18px; margin-top: 14px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .hub-ask-text { flex: 1; font-size: 13px; color: #1e40af; font-weight: 600; }
+  .hub-ask-text span { font-size: 11px; font-weight: 400; color: #3b82f6; display: block; margin-top: 2px; }
+  .hub-ask-btn { background: #2563eb; color: #fff; border: none; border-radius: 20px; padding: 7px 18px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .2s; white-space: nowrap; }
+  .hub-ask-btn:hover { background: #1d4ed8; }
+  .hub-ask-btn.no { background: #e5e7eb; color: #555; }
+  .hub-ask-btn.no:hover { background: #d1d5db; }
+
+  /* hotels */
+  .hotel-option { border: 1px solid #e5e9ef; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .hotel-option.recommended { border-color: #FF6B35; background: rgba(255,107,53,.03); }
+  .hotel-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .hotel-name { font-size: 13px; font-weight: 700; color: var(--deep); }
+  .hotel-stars { color: #fbbf24; font-size: 12px; }
+  .hotel-price { font-size: 14px; font-weight: 800; color: var(--sun); }
+  .hotel-meta { font-size: 11px; color: #667; margin-top: 6px; }
+  .hotel-amenities { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .amenity-tag { font-size: 10px; background: #f0f7ff; color: var(--ocean); border-radius: 20px; padding: 2px 9px; border: 1px solid rgba(0,153,204,.2); }
+
+  /* places */
+  .places-section { margin-bottom: 14px; }
+  .places-cat-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #999; letter-spacing: .06em; margin-bottom: 8px; }
+  .place-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f3f7; align-items: flex-start; }
+  .place-item:last-child { border-bottom: none; }
+  .place-emoji { font-size: 18px; flex-shrink: 0; }
+  .place-name { font-size: 12px; font-weight: 600; color: var(--deep); }
+  .place-tip { font-size: 11px; color: #667; margin-top: 2px; }
+
+  /* itinerary */
+  .itin-day { border-left: 3px solid var(--ocean); padding-left: 16px; margin-bottom: 20px; }
+  .itin-day-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .itin-day-num { width: 32px; height: 32px; background: var(--ocean); color: #fff; border-radius: 50%; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: -22px; }
+  .itin-day-theme { font-size: 13px; font-weight: 700; color: var(--deep); }
+  .itin-day-budget { font-size: 11px; color: #999; margin-left: auto; }
+  .itin-activity { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f4f6f9; }
+  .itin-activity:last-child { border-bottom: none; }
+  .itin-time { font-size: 11px; font-weight: 600; color: var(--ocean); width: 72px; flex-shrink: 0; padding-top: 1px; }
+  .itin-act-body { flex: 1; }
+  .itin-act-name { font-size: 12px; font-weight: 600; color: var(--deep); }
+  .itin-act-loc  { font-size: 11px; color: #888; }
+  .itin-act-cost { font-size: 11px; color: var(--palm); font-weight: 600; }
+  .itin-act-tip  { font-size: 10px; color: #aaa; font-style: italic; margin-top: 2px; }
+  .itin-meals { background: #f8fafc; border-radius: 10px; padding: 10px 12px; margin-top: 10px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .itin-meal { font-size: 11px; color: #556; }
+  .itin-meal span { font-weight: 700; color: var(--sun); }
+  .packing-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .pack-item { font-size: 11px; background: #f0f7ff; color: var(--ocean); border-radius: 20px; padding: 3px 10px; border: 1px solid rgba(0,153,204,.15); }
+  .emergency-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-top: 8px; }
+  .emerg-item { font-size: 11px; background: #fff5f5; color: #c0392b; border-radius: 8px; padding: 6px 10px; border: 1px solid rgba(192,57,43,.15); }
+  .emerg-item strong { display: block; font-size: 10px; color: #999; font-weight: 600; }
+  .weather-banner { display: flex; gap: 12px; align-items: center; background: linear-gradient(135deg,#e8f7ff,#f0f9ff); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; border: 1px solid rgba(0,153,204,.15); }
+  .weather-icon { font-size: 32px; }
+  .weather-info .wt { font-size: 16px; font-weight: 800; color: var(--deep); }
+  .weather-info .ws { font-size: 11px; color: #667; margin-top: 2px; }
+  .budget-breakdown { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 12px; }
+  .bb-item { background: #f8fafc; border-radius: 10px; padding: 10px; text-align: center; border: 1px solid #e8ecf0; }
+  .bb-item .bb-label { font-size: 10px; color: #999; font-weight: 600; text-transform: uppercase; }
+  .bb-item .bb-val   { font-size: 14px; font-weight: 800; color: var(--deep); margin-top: 4px; }
+
+  /* ── BUDGET BAR ── */
+  .budget-bar-wrap {
+    margin-top: 6px;
+    background: #e5e7eb;
+    border-radius: 8px; height: 8px; overflow: hidden;
+  }
+  .budget-bar {
+    height: 100%; border-radius: 8px;
+    background: linear-gradient(90deg, var(--palm), var(--ocean));
+    transition: width 1s ease;
+  }
+  .budget-bar.over { background: linear-gradient(90deg, var(--sunset), var(--coral)); }
+
+  /* ── LOG ── */
+  .log-box {
+    background: #0d1117;
+    border-radius: 12px; padding: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px; color: #7ee787;
+    height: 200px; overflow-y: auto;
+    border: 1px solid #21262d;
+  }
+  .log-line { padding: 2px 0; opacity: 0.9; }
+
+  /* ── DOWNLOAD ── */
+  .btn-download {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%;
+    background: linear-gradient(135deg, var(--palm), var(--ocean));
+    border: none; border-radius: 12px; padding: 16px;
+    color: white; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(0,153,204,0.3);
+  }
+  .btn-download:hover { opacity: 0.9; transform: translateY(-2px); }
+  .btn-download.hidden { display: none; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 50px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+  }
+  .badge.approved { background: #dcfce7; color: #16a34a; }
+  .badge.retry    { background: #fff7ed; color: #ea580c; }
+  .badge.pending  { background: #f1f5f9; color: var(--muted); }
+
+  /* ── PLACEHOLDER ── */
+  .placeholder {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+  }
+  .placeholder .ph-icon {
+    font-size: 72px; margin-bottom: 16px; opacity: 0.5;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+  }
+  .placeholder p { font-size: 15px; line-height: 1.6; }
+  .placeholder strong { color: var(--ocean); }
+
+  /* ── ITINERARY ── */
+  .day-card {
+    background: linear-gradient(135deg, #f0fdf4, #eff6ff);
+    border-radius: 12px; padding: 14px 16px;
+    border-left: 4px solid var(--ocean);
+    margin-bottom: 10px;
+  }
+  .day-card .day-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--deep); margin-bottom: 8px;
+  }
+  .day-card .activity {
+    font-size: 12px; color: var(--muted);
+    padding: 3px 0; display: flex; gap: 8px;
+  }
+  .day-card .activity .time {
+    color: var(--sun); font-weight: 700;
+    min-width: 72px;
+  }
+
+  .section-title {
+    font-size: 12px; font-weight: 700; color: var(--ocean);
+    text-transform: uppercase; letter-spacing: 1.2px;
+    margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  /* ── DECORATIVE STRIP ── */
+  .tropical-strip {
+    height: 4px;
+    background: linear-gradient(90deg, #FF6B35, #FF4F7B, #0099CC, #2ECC71, #FF6B35);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* ── CHATBOT WIDGET ─────────────────────────────────────────────────────── */
+  #chatToggleBtn {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9000;
+    width: 58px; height: 58px; border-radius: 50%;
+    background: linear-gradient(135deg, #0099CC, #0077a8);
+    border: none; cursor: pointer; box-shadow: 0 6px 24px rgba(0,153,204,.45);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; transition: transform .2s, box-shadow .2s;
+  }
+  #chatToggleBtn:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(0,153,204,.6); }
+  #chatBadge {
+    position: absolute; top: 2px; right: 2px; width: 18px; height: 18px;
+    border-radius: 50%; background: #FF4F7B; color: #fff; font-size: 11px;
+    font-weight: 700; display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff; animation: pulse-badge .8s ease-in-out infinite alternate;
+  }
+  @keyframes pulse-badge { from { transform: scale(1); } to { transform: scale(1.25); } }
+
+  #chatWindow {
+    position: fixed; bottom: 100px; right: 28px; z-index: 9001;
+    width: 360px; max-height: 540px; border-radius: 20px;
+    background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: scale(0.85) translateY(40px); opacity: 0;
+    pointer-events: none; transition: transform .25s ease, opacity .25s ease;
+    transform-origin: bottom right;
+  }
+  #chatWindow.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+
+  .chat-header {
+    background: linear-gradient(135deg, #0099CC, #0077a8);
+    padding: 14px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  }
+  .chat-avatar {
+    width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .chat-header-info { flex: 1; }
+  .chat-header-title { color: #fff; font-size: 15px; font-weight: 700; line-height: 1.2; }
+  .chat-header-sub { color: rgba(255,255,255,.8); font-size: 11px; }
+  .chat-close-btn {
+    background: rgba(255,255,255,.15); border: none; color: #fff; width: 28px; height: 28px;
+    border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
+  }
+  .chat-close-btn:hover { background: rgba(255,255,255,.3); }
+
+  #chatMessages {
+    flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px;
+    background: #f8fafc;
+  }
+  #chatMessages::-webkit-scrollbar { width: 4px; }
+  #chatMessages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+  .msg-row { display: flex; align-items: flex-end; gap: 6px; }
+  .msg-row.user { flex-direction: row-reverse; }
+  .msg-bubble {
+    max-width: 78%; padding: 10px 13px; border-radius: 16px;
+    font-size: 13px; line-height: 1.55; word-break: break-word;
+  }
+  .msg-row.bot  .msg-bubble { background: #fff; color: #1a1a2e; border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .msg-row.user .msg-bubble { background: linear-gradient(135deg,#0099CC,#0077a8); color: #fff; border-bottom-right-radius: 4px; }
+  .msg-bot-icon { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#0099CC,#0077a8); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .msg-typing { display: flex; gap: 4px; align-items: center; padding: 12px 14px; }
+  .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: #aaa; animation: typing-anim 1s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: .15s; }
+  .typing-dot:nth-child(3) { animation-delay: .3s; }
+  @keyframes typing-anim { 0%,80%,100% { transform: scale(.8); opacity:.5; } 40% { transform: scale(1.15); opacity:1; } }
+
+  #fillFormBar {
+    padding: 10px 12px; background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-top: 1px solid #bbf7d0; flex-shrink: 0;
+  }
+  #fillFormBtn {
+    width: 100%; padding: 10px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff;
+    font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: .3px;
+  }
+  #fillFormBtn:hover { opacity: .9; }
+
+  .chat-input-wrap {
+    display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid #e5e7eb;
+    background: #fff; flex-shrink: 0;
+  }
+  #chatInput {
+    flex: 1; border: 1.5px solid #e5e7eb; border-radius: 20px; padding: 9px 14px;
+    font-size: 13px; outline: none; font-family: inherit;
+    transition: border-color .2s;
+  }
+  #chatInput:focus { border-color: #0099CC; }
+  #chatSendBtn {
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, #0099CC, #0077a8); color: #fff;
+    font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: transform .15s;
+  }
+  #chatSendBtn:hover { transform: scale(1.1); }
+
+  /* interest chip buttons inside chat */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chat-chip {
+    padding: 5px 11px; border-radius: 20px; border: 1.5px solid #0099CC;
+    background: #fff; color: #0099CC; font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .chat-chip.selected { background: #0099CC; color: #fff; }
+  .chat-chip:hover { background: #e0f4ff; }
+</style>
+</head>
+<body>
+
+<div class="tropical-strip"></div>
+
+<header>
+  <!-- Scenic panorama: beach + mountains + temple -->
+  <svg class="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 280" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0d3b6e"/>
+        <stop offset="55%" stop-color="#1976b5"/>
+        <stop offset="100%" stop-color="#87CEEB"/>
+      </linearGradient>
+      <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#1a8fc1"/>
+        <stop offset="100%" stop-color="#0d5f8a"/>
+      </linearGradient>
+      <linearGradient id="sandGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f0d08a"/>
+        <stop offset="100%" stop-color="#d4a843"/>
+      </linearGradient>
+      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffe066" stop-opacity="1"/>
+        <stop offset="60%" stop-color="#ffb300" stop-opacity="0.7"/>
+        <stop offset="100%" stop-color="#ff8c00" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Sky -->
+    <rect width="1440" height="280" fill="url(#skyGrad)"/>
+
+    <!-- Sun glow -->
+    <circle cx="200" cy="72" r="70" fill="url(#sunGlow)" opacity="0.6"/>
+    <!-- Sun disc -->
+    <circle cx="200" cy="72" r="34" fill="#FFE066"/>
+    <circle cx="200" cy="72" r="28" fill="#FFD700"/>
+
+    <!-- Clouds -->
+    <g opacity="0.85">
+      <ellipse cx="380" cy="52" rx="72" ry="26" fill="white"/>
+      <ellipse cx="350" cy="56" rx="44" ry="20" fill="white"/>
+      <ellipse cx="420" cy="58" rx="50" ry="18" fill="white"/>
+    </g>
+    <g opacity="0.7">
+      <ellipse cx="1100" cy="44" rx="60" ry="22" fill="white"/>
+      <ellipse cx="1070" cy="48" rx="38" ry="18" fill="white"/>
+      <ellipse cx="1140" cy="50" rx="44" ry="16" fill="white"/>
+    </g>
+
+    <!-- Far mountains (snow-capped, purple haze) -->
+    <polygon points="0,190 80,95 160,160 260,70 380,150 500,55 620,145 740,50 860,140 980,60 1100,130 1200,75 1300,120 1440,65 1440,200 0,200" fill="#5b6fa6" opacity="0.65"/>
+    <!-- Snow caps -->
+    <polygon points="260,70 290,110 230,110" fill="white" opacity="0.7"/>
+    <polygon points="500,55 530,100 470,100" fill="white" opacity="0.7"/>
+    <polygon points="740,50 768,95 712,95" fill="white" opacity="0.7"/>
+    <polygon points="980,60 1010,105 950,105" fill="white" opacity="0.65"/>
+
+    <!-- Mid mountains (green forest) -->
+    <polygon points="0,210 100,135 220,195 380,110 530,185 680,105 820,180 970,115 1120,175 1260,110 1440,155 1440,215 0,215" fill="#2e7d45" opacity="0.85"/>
+
+    <!-- Temple / pagoda (centered) -->
+    <!-- Base platform -->
+    <rect x="650" y="182" width="140" height="33" fill="#3b2a1a" rx="2"/>
+    <!-- Stairs -->
+    <rect x="700" y="176" width="40" height="8" fill="#4a3522"/>
+    <!-- Main body -->
+    <rect x="668" y="148" width="104" height="38" fill="#8B4513"/>
+    <!-- Door arch -->
+    <rect x="705" y="163" width="30" height="23" fill="#2a1a0a" rx="3"/>
+    <ellipse cx="720" cy="163" rx="15" ry="8" fill="#2a1a0a"/>
+    <!-- Windows -->
+    <rect x="675" y="154" width="18" height="14" fill="#f5c07a" opacity="0.5" rx="2"/>
+    <rect x="747" y="154" width="18" height="14" fill="#f5c07a" opacity="0.5" rx="2"/>
+    <!-- Roof 1 (widest) -->
+    <polygon points="645,152 720,118 795,152" fill="#c0392b"/>
+    <rect x="641" y="148" width="158" height="8" fill="#a93226" rx="1"/>
+    <!-- Eave curves (decorative) -->
+    <path d="M641,152 Q660,160 680,150" stroke="#e74c3c" stroke-width="2" fill="none"/>
+    <path d="M799,152 Q780,160 760,150" stroke="#e74c3c" stroke-width="2" fill="none"/>
+    <!-- Roof 2 -->
+    <polygon points="660,122 720,94 780,122" fill="#c0392b"/>
+    <rect x="656" y="118" width="128" height="7" fill="#a93226" rx="1"/>
+    <!-- Roof 3 (top) -->
+    <polygon points="678,98 720,74 762,98" fill="#c0392b"/>
+    <rect x="674" y="94" width="92" height="6" fill="#a93226" rx="1"/>
+    <!-- Spire -->
+    <rect x="717" y="56" width="6" height="20" fill="#8B4513"/>
+    <polygon points="714,58 720,44 726,58" fill="#FFD700"/>
+    <!-- Flag -->
+    <polygon points="723,44 738,50 723,56" fill="#e74c3c"/>
+
+    <!-- Left palm tree -->
+    <rect x="118" y="192" width="9" height="52" fill="#5D4037" rx="2"/>
+    <rect x="116" y="200" width="13" height="30" fill="#4e3629" rx="2"/>
+    <!-- fronds -->
+    <ellipse cx="123" cy="188" rx="35" ry="11" fill="#27ae60" transform="rotate(-30,123,188)"/>
+    <ellipse cx="123" cy="188" rx="32" ry="10" fill="#2ecc71" transform="rotate(10,123,188)"/>
+    <ellipse cx="123" cy="188" rx="30" ry="9" fill="#27ae60" transform="rotate(45,123,188)"/>
+    <ellipse cx="123" cy="188" rx="28" ry="9" fill="#2ecc71" transform="rotate(-55,123,188)"/>
+    <ellipse cx="123" cy="188" rx="26" ry="8" fill="#27ae60" transform="rotate(75,123,188)"/>
+    <!-- coconuts -->
+    <circle cx="126" cy="195" r="5" fill="#8B6914"/>
+    <circle cx="119" cy="197" r="4" fill="#7a5c10"/>
+
+    <!-- Right palm tree -->
+    <rect x="1308" y="188" width="9" height="56" fill="#5D4037" rx="2"/>
+    <ellipse cx="1312" cy="184" rx="35" ry="11" fill="#27ae60" transform="rotate(25,1312,184)"/>
+    <ellipse cx="1312" cy="184" rx="32" ry="10" fill="#2ecc71" transform="rotate(-15,1312,184)"/>
+    <ellipse cx="1312" cy="184" rx="30" ry="9" fill="#27ae60" transform="rotate(55,1312,184)"/>
+    <ellipse cx="1312" cy="184" rx="28" ry="9" fill="#2ecc71" transform="rotate(-50,1312,184)"/>
+
+    <!-- Sea -->
+    <rect x="0" y="215" width="1440" height="65" fill="url(#seaGrad)"/>
+    <!-- Waves -->
+    <path d="M0,222 C90,212 180,232 270,222 C360,212 450,232 540,222 C630,212 720,232 810,222 C900,212 990,232 1080,222 C1170,212 1260,232 1350,222 L1440,222 L1440,215 L0,215 Z" fill="rgba(255,255,255,0.25)"/>
+    <path d="M0,235 C80,224 160,244 240,235 C320,224 400,244 480,235 C560,224 640,244 720,235 C800,224 880,244 960,235 C1040,224 1120,244 1200,235 C1280,224 1360,244 1440,235 L1440,280 L0,280 Z" fill="rgba(255,255,255,0.12)"/>
+
+    <!-- Sand beach strip -->
+    <path d="M0,245 C200,238 400,255 600,245 C800,235 1000,255 1200,245 C1300,240 1380,250 1440,245 L1440,280 L0,280 Z" fill="url(#sandGrad)" opacity="0.9"/>
+
+    <!-- Seagulls -->
+    <path d="M340,90 Q348,83 356,90" stroke="white" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <path d="M360,80 Q368,73 376,80" stroke="white" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <path d="M1050,72 Q1058,65 1066,72" stroke="white" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+    <!-- Overlay for text readability -->
+    <rect width="1440" height="340" fill="rgba(5,18,50,0.48)"/>
+    <rect width="600" height="340" fill="rgba(5,18,50,0.18)"/>
+  </svg>
+
+  <div class="header-inner">
+    <div class="header-eyebrow">
+      <div class="header-dot"></div>
+      <span>AI-Powered · 15 Agents · Live Data</span>
+    </div>
+    <h1>Your Dream Trip</h1>
+    <p class="header-tagline">Tell us where you want to go — we'll handle everything else.</p>
+    <div class="header-badges">
+      <div class="header-badge">✈️ Flights & Trains</div>
+      <div class="header-badge">🏨 Hotels</div>
+      <div class="header-badge">🌤️ Live Weather</div>
+      <div class="header-badge">📅 Day-wise Itinerary</div>
+      <div class="header-badge">📄 PDF Report</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- LEFT — Input Form -->
+  <div>
+    <div class="card">
+      <div class="form-grid">
+
+        <div>
+          <label>From</label>
+          <input id="source" type="text" placeholder="e.g. Bangalore" value="Bangalore"/>
+        </div>
+        <div>
+          <label>To</label>
+          <input id="destination" type="text" placeholder="e.g. Goa" value="Goa"/>
+        </div>
+
+        <div class="full">
+          <label>Travel Dates</label>
+          <div class="date-range-wrap">
+            <div class="date-input-box">
+              <input id="date_from" type="text" placeholder="Departure date" readonly/>
+              <span class="date-cal-icon">📅</span>
+            </div>
+            <div class="date-input-box">
+              <input id="date_to" type="text" placeholder="Return date" readonly/>
+              <span class="date-cal-icon">📅</span>
+            </div>
+          </div>
+          <input id="travel_dates" type="hidden" value=""/>
+        </div>
+
+        <div>
+          <label>Days</label>
+          <input id="num_days" type="number" min="1" max="30" value="5"/>
+        </div>
+        <div>
+          <label>Travelers</label>
+          <input id="num_travelers" type="number" min="1" max="20" value="2"/>
+        </div>
+
+        <div>
+          <label>Budget (₹)</label>
+          <input id="budget" type="number" min="1000" value="30000"/>
+        </div>
+        <div>
+          <label>Travel Type</label>
+          <select id="travel_type">
+            <option value="couple">Couple</option>
+            <option value="solo">Solo</option>
+            <option value="family">Family</option>
+            <option value="business">Business</option>
+            <option value="friends">Friends Group</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Transport</label>
+          <select id="transport_pref" onchange="updateSeatOptions()">
+            <option value="flight">Flight ✈️</option>
+            <option value="train">Train 🚆</option>
+            <option value="bus">Bus 🚌</option>
+            <option value="car">Car / Self-Drive 🚗</option>
+          </select>
+        </div>
+        <div>
+          <label>Seat Preference</label>
+          <select id="seat_pref">
+            <option value="window">Window Seat</option>
+            <option value="aisle">Aisle Seat</option>
+            <option value="middle">Middle Seat</option>
+          </select>
+        </div>
+        <div>
+          <label>Budget Tier</label>
+          <select id="luxury_or_budget">
+            <option value="mid-range">Mid-Range 🌟</option>
+            <option value="budget">Budget 💸</option>
+            <option value="luxury">Luxury 💎</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label>Hotel Preference</label>
+          <select id="hotel_pref">
+            <option value="beach resort">Beach Resort 🏖️</option>
+            <option value="city centre hotel">City Centre Hotel 🏙️</option>
+            <option value="hill station resort">Hill Station / Nature Resort 🌿</option>
+            <option value="heritage boutique hotel">Heritage / Boutique Hotel 🏰</option>
+            <option value="business hotel">Business Hotel 💼</option>
+            <option value="spa wellness resort">Spa & Wellness Resort 🧘</option>
+            <option value="any">No Preference</option>
+          </select>
+        </div>
+        <div>
+          <label>No. of Rooms <span style="font-size:11px;color:#999;font-weight:400;">(auto from travel type)</span></label>
+          <input id="num_rooms" type="number" min="1" max="20" value="1" placeholder="Rooms needed"/>
+        </div>
+        <div class="full">
+          <label>Food Preference</label>
+          <input id="food_pref" type="text" placeholder="e.g. seafood, veg, local" value="seafood"/>
+        </div>
+
+        <div class="full">
+          <label>Must-Visit Places <span style="font-size:11px;color:#999;font-weight:400;">(optional — add places you specifically want in your trip)</span></label>
+          <input id="must_visit_places" type="text" placeholder="e.g. Araku Valley, RK Beach, Borra Caves"
+            style="width:100%;"/>
+          <div id="mustVisitTags" style="display:none;margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+
+        <div class="full">
+          <label>Interests</label>
+          <div class="interests" id="interests">
+            <span class="interest-btn active" data-val="beach">🏖 Beach</span>
+            <span class="interest-btn active" data-val="nightlife">🎉 Nightlife</span>
+            <span class="interest-btn active" data-val="sightseeing">🏛 Sightseeing</span>
+            <span class="interest-btn" data-val="food">🍜 Food Tour</span>
+            <span class="interest-btn" data-val="adventure">🧗 Adventure</span>
+            <span class="interest-btn" data-val="heritage">🏰 Heritage</span>
+            <span class="interest-btn" data-val="nature">🌿 Nature</span>
+          </div>
+        </div>
+
+      </div>
+      <button class="btn-plan" id="planBtn" onclick="planTrip()">
+        🚀 Generate Trip Plan
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT — Results -->
+  <div class="right-panel" id="rightPanel">
+
+    <!-- Agent Pipeline -->
+    <div class="card">
+      <div class="pipeline" id="pipeline">
+        <div class="agent-step" id="step-orchestrator"><span class="step-icon">🧠</span><span class="step-name">Orchestrator Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-memory"><span class="step-icon">🗄</span><span class="step-name">Memory Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-weather"><span class="step-icon">🌤</span><span class="step-name">Weather Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-transport"><span class="step-icon">✈</span><span class="step-name">Transport Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-hotel"><span class="step-icon">🏨</span><span class="step-name">Hotel Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-places"><span class="step-icon">📍</span><span class="step-name">Places Explorer Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-budget"><span class="step-icon">💰</span><span class="step-name">Budget Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-itinerary"><span class="step-icon">📅</span><span class="step-name">Itinerary Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-review"><span class="step-icon">🔍</span><span class="step-name">Review Agent</span><span class="step-status">Waiting</span></div>
+        <div class="agent-step" id="step-pdf"><span class="step-icon">📄</span><span class="step-name">PDF Generator Agent</span><span class="step-status">Waiting</span></div>
+      </div>
+    </div>
+
+    <!-- Placeholder -->
+    <div class="card" id="placeholderCard">
+      <div class="placeholder">
+        <div class="ph-icon">🌴</div>
+        <p>Fill in your details and click<br><strong>Generate Trip Plan</strong> to get started.</p>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card" id="resultsCard" style="display:none">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:var(--ocean)">Trip Summary</div>
+        <span id="reviewBadge" class="badge pending">Pending</span>
+      </div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div style="margin-top:16px;" id="budgetBarWrap">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;">
+          <span style="font-weight:600">Budget Used</span>
+          <span id="budgetPct" style="font-weight:700">0%</span>
+        </div>
+        <div class="budget-bar-wrap"><div class="budget-bar" id="budgetBar" style="width:0%"></div></div>
+      </div>
+      <!-- Evaluation Scorecard -->
+      <div class="eval-card" id="evalCard" style="display:none">
+        <div class="eval-header">
+          <div>
+            <div class="eval-title">Trip Quality Score</div>
+            <div id="evalGrade" class="eval-grade" style="margin-top:6px">—</div>
+          </div>
+          <div class="eval-score-ring">
+            <svg viewBox="0 0 72 72" width="72" height="72">
+              <circle class="ring-bg"  cx="36" cy="36" r="30"/>
+              <circle class="ring-val" cx="36" cy="36" r="30" id="ringVal"
+                stroke="#00c864"
+                stroke-dasharray="188.5"
+                stroke-dashoffset="188.5"/>
+            </svg>
+            <div class="eval-score-center">
+              <div class="eval-score-num" id="evalScoreNum">0</div>
+              <div class="eval-score-max">/100</div>
+            </div>
+          </div>
+        </div>
+        <div class="eval-bars" id="evalBars"></div>
+        <div class="eval-recs" id="evalRecs" style="display:none">
+          <div class="eval-recs-title">Recommendations</div>
+          <div id="evalRecsList"></div>
+        </div>
+      </div>
+      <!-- Guardrail warnings -->
+      <div id="guardrailWarn" style="display:none"></div>
+    </div>
+
+    <!-- Weather + Budget Breakdown -->
+    <div id="weatherBudgetCard" style="display:none">
+      <div class="detail-card">
+        <div class="detail-card-title">🌤 Weather &amp; Budget Breakdown</div>
+        <div id="weatherBanner"></div>
+        <div class="budget-breakdown" id="budgetBreakdown"></div>
+      </div>
+    </div>
+
+    <!-- Transport Details -->
+    <div id="transportCard" style="display:none">
+      <div class="detail-card">
+        <div class="detail-card-title">✈ Transport Options <span class="badge-live" id="transportLiveBadge"></span></div>
+        <div id="transportAlert"></div>
+        <div id="transportOptions"></div>
+      </div>
+    </div>
+
+    <!-- Hotel Details -->
+    <div id="hotelCard" style="display:none">
+      <div class="detail-card">
+        <div class="detail-card-title">🏨 Hotel Options <span class="badge-live" id="hotelLiveBadge"></span> <span id="hotelRoomsLabel" style="font-size:11px;background:#f0f7ff;color:#0099cc;border:1px solid rgba(0,153,204,.2);border-radius:20px;padding:2px 10px;margin-left:6px;"></span></div>
+        <div id="hotelOptions"></div>
+      </div>
+    </div>
+
+    <!-- Places Details -->
+    <div id="placesCard" style="display:none">
+      <div class="detail-card">
+        <div class="detail-card-title">📍 Places &amp; Attractions <span class="badge-live" id="placesLiveBadge"></span></div>
+        <div id="placesContent"></div>
+      </div>
+    </div>
+
+    <!-- Hub city stopover ask -->
+    <div id="hubAskCard" style="display:none">
+      <div class="detail-card">
+        <div class="hub-ask-box" id="hubAskBox">
+          <div style="font-size:28px">🛑</div>
+          <div class="hub-ask-text">
+            <span id="hubAskTitle">No direct service from your source</span>
+            <span id="hubAskSub">You'll be stopping at a hub city. Want to see places to visit there?</span>
+          </div>
+          <button class="hub-ask-btn" id="hubYesBtn" onclick="loadHubPlaces()">Yes, show places</button>
+          <button class="hub-ask-btn no" onclick="document.getElementById('hubAskCard').style.display='none'">No thanks</button>
+        </div>
+        <div id="hubPlacesContent" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <!-- Itinerary -->
+    <div id="itinCard" style="display:none">
+      <div class="detail-card">
+        <div class="detail-card-title">📅 Day-by-Day Itinerary</div>
+        <div id="itinSummary" style="font-size:13px;color:#667;margin-bottom:16px;"></div>
+        <div id="itinDays"></div>
+        <div id="itinExtras"></div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="card" id="logCard" style="display:none">
+      <div class="section-title">🖥 Agent Execution Log</div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+
+    <!-- Download -->
+    <a href="/download" class="btn-download hidden" id="downloadBtn" download>
+      📥 Download Trip Plan PDF
+    </a>
+
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.interest-btn').forEach(btn => {
+  btn.addEventListener('click', () => btn.classList.toggle('active'));
+});
+
+const SEAT_OPTIONS = {
+  flight: [
+    { value: 'window',  label: 'Window Seat' },
+    { value: 'aisle',   label: 'Aisle Seat' },
+    { value: 'middle',  label: 'Middle Seat' },
+  ],
+  bus: [
+    { value: 'lower', label: 'Lower Berth' },
+    { value: 'upper', label: 'Upper Berth' },
+    { value: 'no_preference', label: 'No Preference' },
+  ],
+  train: [
+    { value: '1A',  label: '1A — First AC (4-berth, curtained)' },
+    { value: '2A',  label: '2A — Second AC (side/main berth)' },
+    { value: '3A',  label: '3A — Third AC (6-berth, value)' },
+    { value: 'SL',  label: 'SL — Sleeper (non-AC, budget)' },
+    { value: 'CC',  label: 'CC — Chair Car (day train)' },
+    { value: 'EC',  label: 'EC — Executive Chair (premium day)' },
+  ],
+  car: [
+    { value: 'self_drive', label: 'Self Drive' },
+    { value: 'with_driver', label: 'With Driver' },
+  ],
+};
+
+function updateSeatOptions() {
+  const mode = document.getElementById('transport_pref').value;
+  const sel  = document.getElementById('seat_pref');
+  const opts = SEAT_OPTIONS[mode] || SEAT_OPTIONS['flight'];
+  sel.innerHTML = opts.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+}
+updateSeatOptions(); // init on load
+
+function autoUpdateRooms() {
+  const type     = document.getElementById('travel_type').value;
+  const travelers = parseInt(document.getElementById('num_travelers').value) || 1;
+  let rooms = 1;
+  if      (type === 'solo')     rooms = 1;
+  else if (type === 'couple')   rooms = 1;                              // share 1 room
+  else if (type === 'family')   rooms = Math.max(1, Math.ceil(travelers / 2));
+  else if (type === 'friends')  rooms = Math.max(1, Math.ceil(travelers / 2)); // club rooms
+  else if (type === 'business') rooms = travelers;                      // 1 per person
+  else                          rooms = Math.max(1, Math.ceil(travelers / 2));
+  document.getElementById('num_rooms').value = rooms;
+}
+
+document.getElementById('travel_type').addEventListener('change', autoUpdateRooms);
+document.getElementById('num_travelers').addEventListener('input', autoUpdateRooms);
+autoUpdateRooms(); // init on load
+
+const AGENT_STEPS = [
+  { id: 'step-orchestrator', keyword: 'Orchestrator' },
+  { id: 'step-memory',       keyword: 'MemoryAgent' },
+  { id: 'step-weather',      keyword: 'WeatherAgent' },
+  { id: 'step-transport',    keyword: 'TransportAgent' },
+  { id: 'step-hotel',        keyword: 'HotelAgent' },
+  { id: 'step-places',       keyword: 'PlacesAgent' },
+  { id: 'step-budget',       keyword: 'BudgetAgent' },
+  { id: 'step-itinerary',    keyword: 'ItineraryAgent' },
+  { id: 'step-review',       keyword: 'ReviewAgent' },
+  { id: 'step-pdf',          keyword: 'PDFAgent' },
+];
+
+function resetPipeline() {
+  AGENT_STEPS.forEach(s => {
+    const el = document.getElementById(s.id);
+    el.className = 'agent-step';
+    el.querySelector('.step-status').textContent = 'Waiting';
+  });
+}
+
+function animatePipeline(messages) {
+  AGENT_STEPS.forEach(s => {
+    const el = document.getElementById(s.id);
+    const matched = messages.find(m => m.includes(s.keyword));
+    if (matched) {
+      el.className = 'agent-step done';
+      const short = matched.split('] ')[1] || matched;
+      el.querySelector('.step-status').textContent = short.length > 60 ? short.slice(0, 60) + '…' : short;
+    }
+  });
+}
+
+function simulatePipelineProgress() {
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= AGENT_STEPS.length) { clearInterval(interval); return; }
+    const el = document.getElementById(AGENT_STEPS[i].id);
+    el.className = 'agent-step running';
+    el.querySelector('.step-status').innerHTML = '<span class="spinner"></span> Running…';
+    if (i > 0) {
+      const prev = document.getElementById(AGENT_STEPS[i - 1].id);
+      if (prev.className.includes('running')) {
+        prev.className = 'agent-step done';
+        prev.querySelector('.step-status').textContent = 'Done';
+      }
+    }
+    i++;
+  }, 1800);
+  return interval;
+}
+
+async function planTrip() {
+  const btn = document.getElementById('planBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Planning your trip…';
+
+  document.getElementById('placeholderCard').style.display  = 'none';
+  document.getElementById('resultsCard').style.display      = 'none';
+  document.getElementById('weatherBudgetCard').style.display= 'none';
+  document.getElementById('transportCard').style.display    = 'none';
+  document.getElementById('hotelCard').style.display        = 'none';
+  document.getElementById('placesCard').style.display       = 'none';
+  document.getElementById('hubAskCard').style.display       = 'none';
+  document.getElementById('itinCard').style.display         = 'none';
+  document.getElementById('logCard').style.display          = 'none';
+  document.getElementById('downloadBtn').classList.add('hidden');
+  resetPipeline();
+
+  const interests = Array.from(document.querySelectorAll('.interest-btn.active')).map(b => b.dataset.val);
+
+  const payload = {
+    source:           document.getElementById('source').value,
+    destination:      document.getElementById('destination').value,
+    travel_dates:     document.getElementById('travel_dates').value,
+    num_days:         document.getElementById('num_days').value,
+    budget:           document.getElementById('budget').value,
+    num_travelers:    document.getElementById('num_travelers').value,
+    travel_type:      document.getElementById('travel_type').value,
+    hotel_pref:       document.getElementById('hotel_pref').value,
+    num_rooms:        parseInt(document.getElementById('num_rooms').value) || 1,
+    food_pref:        document.getElementById('food_pref').value,
+    transport_pref:   document.getElementById('transport_pref').value,
+    seat_pref:        document.getElementById('seat_pref').value,
+    luxury_or_budget:  document.getElementById('luxury_or_budget').value,
+    places_interest:   interests,
+    must_visit_places: document.getElementById('must_visit_places').value,
+  };
+
+  const progressInterval = simulatePipelineProgress();
+
+  try {
+    const resp = await fetch('/plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    clearInterval(progressInterval);
+
+    if (data.status === 'guardrail_error') {
+      clearInterval(progressInterval);
+      resetPipeline();
+      const errList = (data.errors || []).map(e => `• ${e}`).join('\n');
+      alert('⛔ Input validation failed:\n\n' + errList);
+    } else if (data.status === 'error') {
+      alert('Error: ' + data.message);
+      resetPipeline();
+    } else {
+      animatePipeline(data.messages || []);
+
+      // 1. Weather warning — ask user before showing results
+      if (data.weather_warning && data.weather_warning.show) {
+        const proceed = await showWeatherWarning(data.weather_warning);
+        if (!proceed) {
+          resetPipeline();
+          btn.disabled = false;
+          btn.textContent = '🚀 Generate Trip Plan';
+          return;
+        }
+      }
+
+      // 2. Budget exceeded — inform user (trip still shown)
+      if (data.budget_exceeded && data.budget_exceeded.show) {
+        await showBudgetExceeded(data.budget_exceeded);
+      }
+
+      // 3. No tickets — inform user (trip still shown with boarding info)
+      if (data.no_tickets && data.no_tickets.show) {
+        showNoTickets(data.no_tickets);
+      }
+
+      showResults(data, payload);
+    }
+  } catch (err) {
+    clearInterval(progressInterval);
+    alert('Request failed: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Generate Trip Plan';
+  }
+}
+
+// ── Hub city stopover ask ─────────────────────────────────────────────────
+let _hubCity = null;
+let _hubInterests = [];
+
+function showHubAsk(transportData, placesData) {
+  const hubCity = transportData && transportData.nearest_hub;
+  if (!hubCity) return;
+
+  _hubCity      = hubCity;
+  _hubInterests = placesData && placesData.interests ? placesData.interests : ['sightseeing'];
+
+  document.getElementById('hubAskCard').style.display  = 'block';
+  document.getElementById('hubPlacesContent').innerHTML = '';
+  document.getElementById('hubYesBtn').disabled         = false;
+  document.getElementById('hubYesBtn').textContent      = 'Yes, show places';
+  document.getElementById('hubAskTitle').textContent    = `Stopover at ${hubCity} — explore while you're there?`;
+  document.getElementById('hubAskSub').textContent      =
+    `No direct service from your source. You'll board at ${hubCity}. Want to see what to visit there?`;
+}
+
+async function loadHubPlaces() {
+  if (!_hubCity) return;
+  const btn = document.getElementById('hubYesBtn');
+  btn.disabled    = true;
+  btn.textContent = 'Loading…';
+
+  try {
+    const resp = await fetch('/places_for_city', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ city: _hubCity, interests: _hubInterests }),
+    });
+    const data = await resp.json();
+    if (data.status === 'success') {
+      document.getElementById('hubAskBox').style.display = 'none';
+      const container = document.getElementById('hubPlacesContent');
+      container.innerHTML = `<div class="detail-card-title" style="margin-bottom:12px">
+        📍 Places to Visit in <strong>${_hubCity}</strong> (Stopover)
+        <span class="badge-live">● LIVE</span>
+      </div>`;
+      // Reuse renderPlaces logic inline
+      const pd = data.places_data || {};
+      const catIcons  = { beaches:'🏖', sightseeing:'🏛', nightlife:'🎉', food_spots:'🍽', indoor_activities:'🏛' };
+      const catLabels = { beaches:'Beaches', sightseeing:'Sightseeing', nightlife:'Nightlife', food_spots:'Food & Restaurants', indoor_activities:'Indoor Activities' };
+      let html = '';
+      for (const [cat, items] of Object.entries(pd.places || {})) {
+        if (!items || !items.length) continue;
+        html += `<div class="places-section"><div class="places-cat-title">${catIcons[cat]||'📌'} ${catLabels[cat]||cat}</div>`;
+        items.forEach(p => {
+          const tip  = p.tip||p.snippet||p.must_try||p.details||'';
+          const link = p.source_url ? `<a href="${p.source_url}" target="_blank" style="font-size:10px;color:var(--ocean)"> ↗</a>` : '';
+          html += `<div class="place-item">
+            <div class="place-emoji">${catIcons[cat]||'📌'}</div>
+            <div><div class="place-name">${p.name||p.title||'—'}${link}</div>
+            <div class="place-tip">${tip}</div></div>
+          </div>`;
+        });
+        html += '</div>';
+      }
+      container.innerHTML += html || '<p style="font-size:12px;color:#999">No places found for this city.</p>';
+    } else {
+      btn.disabled    = false;
+      btn.textContent = 'Retry';
+    }
+  } catch (e) {
+    btn.disabled    = false;
+    btn.textContent = 'Retry';
+  }
+}
+
+// ── Weather + Budget renderer ─────────────────────────────────────────────
+function renderWeatherBudget(data) {
+  const w = data.weather || {};
+  const b = data.budget  || {};
+  if (!w.summary && !b.estimated_total) return;
+  document.getElementById('weatherBudgetCard').style.display = 'block';
+  const tempMin = (w.temperature||{}).min || w.temperature || '—';
+  const tempMax = (w.temperature||{}).max || '—';
+  const icon = w.rainfall_risk === 'high' ? '🌧' : w.rainfall_risk === 'medium' ? '⛅' : '☀️';
+  document.getElementById('weatherBanner').innerHTML = `
+    <div class="weather-banner">
+      <div class="weather-icon">${icon}</div>
+      <div class="weather-info">
+        <div class="wt">${tempMin}°C – ${tempMax}°C</div>
+        <div class="ws">${w.summary || ''} · Rain risk: ${w.rainfall_risk || 'low'}</div>
+      </div>
+    </div>`;
+  const bd = b.breakdown || {};
+  const items = [
+    { label: 'Transport', val: bd.transport||0,      emoji: '✈' },
+    { label: 'Hotel',     val: bd.hotel||0,           emoji: '🏨' },
+    { label: 'Food',      val: bd.food||0,             emoji: '🍽' },
+    { label: 'Activities',val: bd.activities||0,       emoji: '🎯' },
+    { label: 'Misc',      val: bd.miscellaneous||0,    emoji: '💼' },
+    { label: 'Per Person',val: b.per_person_cost||0,   emoji: '👤' },
+  ];
+  document.getElementById('budgetBreakdown').innerHTML = items.map(i => `
+    <div class="bb-item">
+      <div class="bb-label">${i.emoji} ${i.label}</div>
+      <div class="bb-val">₹${Number(i.val).toLocaleString('en-IN')}</div>
+    </div>`).join('');
+}
+
+// ── Transport renderer ────────────────────────────────────────────────────
+function renderTransport(td) {
+  if (!td) return;
+
+  // No tickets banner — show even with 0 options
+  if (td.no_tickets_available) {
+    document.getElementById('transportCard').style.display = 'block';
+    document.getElementById('transportOptions').innerHTML = `
+      <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:12px;padding:18px 20px;text-align:center;margin:8px 0;">
+        <div style="font-size:28px;margin-bottom:8px;">🎫</div>
+        <div style="font-weight:700;color:#856404;font-size:15px;">No Tickets Available</div>
+        <div style="color:#856404;font-size:13px;margin-top:6px;">${td.no_tickets_message || 'No tickets found. Try a different transport mode or dates.'}</div>
+      </div>`;
+    if (td.boarding_alert) {
+      document.getElementById('transportAlert').innerHTML = `
+        <div class="boarding-alert">
+          <div class="ba-title">📍 Nearest Boarding Point Found</div>
+          <div class="ba-body">${td.boarding_alert}</div>
+          ${td.local_transfer ? `<div class="ba-transfer" style="margin-top:8px;padding:8px 12px;background:#fff8e1;border-radius:8px;font-size:12px;color:#b8860b;">⚠️ <strong>You must travel personally:</strong> ${td.local_transfer}</div>` : ''}
+        </div>`;
+    }
+    return;
+  }
+
+  if (!td.options || !td.options.length) return;
+  document.getElementById('transportCard').style.display = 'block';
+  const isLive = (td.data_source||'').toLowerCase().includes('live') || (td.data_source||'').toLowerCase().includes('serper');
+  const seatLabel = (td.seat_pref||'').replace(/_/g,' ').toUpperCase();
+  document.getElementById('transportLiveBadge').textContent = isLive ? '● LIVE' : 'Demo data';
+  const transportTitle = document.querySelector('#transportCard .detail-card-title');
+  if (seatLabel && transportTitle) {
+    transportTitle.innerHTML = `&#x2708; Transport Options
+      <span class="badge-live" id="transportLiveBadge">${isLive ? '● LIVE' : 'Demo data'}</span>
+      <span style="font-size:10px;background:#f0f7ff;color:var(--ocean);border:1px solid rgba(0,153,204,.2);border-radius:20px;padding:2px 10px;margin-left:6px;">${seatLabel}</span>`;
+  }
+  const modeIcon = {'flight':'✈️','train':'🚆','bus':'🚌','car':'🚗'}[td.mode] || '🚌';
+  const rec = td.recommended || '';
+  const alertBox = document.getElementById('transportAlert');
+  if (td.boarding_alert) {
+    const travelTime = td.hub_travel_time ? ` (${td.hub_travel_time})` : '';
+    alertBox.innerHTML = `<div class="boarding-alert">
+      <div class="ba-title">📍 No Direct Service — Nearest Boarding Point: ${td.nearest_hub || ''}${travelTime}</div>
+      <div class="ba-body">${td.boarding_alert}</div>
+      ${td.personal_travel_required ? `
+        <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:12px 16px;margin-top:10px;font-size:13px;color:#856404;">
+          <strong>⚠️ Personal Travel Required:</strong> You must travel on your own from your location to the boarding point before taking ${td.mode || 'transport'}.
+          ${td.hub_lat ? `<br><span style="font-size:11px;color:#aaa;">Coordinates: ${td.hub_lat}, ${td.hub_lng}</span>` : ''}
+        </div>` : ''}
+      ${td.local_transfer ? `<div class="ba-transfer" style="margin-top:8px;">🚖 ${td.local_transfer}</div>` : ''}
+    </div>`;
+  } else { alertBox.innerHTML = ''; }
+  document.getElementById('transportOptions').innerHTML = td.options.map(o => {
+    const isRec = rec.toLowerCase().includes((o.operator||o.train_name||'').toLowerCase().slice(0,8));
+    const price = o.total_price ? `₹${Number(o.total_price).toLocaleString('en-IN')}` :
+                  o.total_cost  ? `₹${Number(o.total_cost).toLocaleString('en-IN')}` : '';
+    const details = [
+      o.flight_no  ? `Flight: ${o.flight_no}` : '',
+      o.train_name ? `Train: ${o.train_name} (${o.train_no||''})` : '',
+      o.departure  ? `Dep: ${o.departure}` : '',
+      o.arrival    ? `Arr: ${o.arrival}` : '',
+      o.duration   ? `Duration: ${o.duration}` : '',
+      o.class      ? `Class: ${o.class}` : '',
+      o.stops      ? `Stops: ${o.stops}` : '',
+      o.distance_km? `Distance: ${o.distance_km} km` : '',
+      o.type       ? `Type: ${o.type}` : '',
+      o.details    ? o.details.slice(0,120) : '',
+      o.source_url ? `<a href="${o.source_url}" target="_blank" style="color:var(--ocean)">Book →</a>` : '',
+    ].filter(Boolean).join(' · ');
+    return `<div class="transport-option ${isRec?'recommended':''}">
+      <div class="transport-mode-icon">${modeIcon}</div>
+      <div class="transport-body">
+        <div class="transport-name">${o.operator||o.train_name||'Option'}${isRec?'<span class="rec-chip">Recommended</span>':''}</div>
+        <div class="transport-detail">${details}</div>
+        ${o.boarding_note?`<div class="boarding-note-tag">📍 ${o.boarding_note}</div>`:''}
+      </div>
+      ${price?`<div class="transport-price">${price}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── Hotel renderer ────────────────────────────────────────────────────────
+function renderHotels(hd) {
+  if (!hd || !hd.options || !hd.options.length) return;
+  document.getElementById('hotelCard').style.display = 'block';
+  const isLive = (hd.data_source||'').toLowerCase().includes('live') || (hd.data_source||'').toLowerCase().includes('serper');
+  document.getElementById('hotelLiveBadge').textContent = isLive ? '● LIVE' : 'Demo data';
+  if (hd.rooms_label) {
+    document.getElementById('hotelRoomsLabel').textContent = `🛏 ${hd.rooms_label}`;
+  }
+  const rec = hd.recommended || '';
+  document.getElementById('hotelOptions').innerHTML = hd.options.map(h => {
+    const isRec = rec === h.name;
+    const stars = h.rating ? '★'.repeat(h.rating)+'☆'.repeat(5-h.rating) : '';
+    const amenities = (h.amenities||[]).map(a=>`<span class="amenity-tag">${a}</span>`).join('');
+    const price = h.total_cost ? `₹${Number(h.total_cost).toLocaleString('en-IN')} total` :
+                  h.price_night ? `₹${Number(h.price_night).toLocaleString('en-IN')}/night` : '';
+    const meta = [h.location, h.tripadvisor?`★ ${h.tripadvisor} TripAdvisor`:'', h.highlights||h.details||''].filter(Boolean).join(' · ');
+    const url = h.source_url?`<a href="${h.source_url}" target="_blank" style="font-size:11px;color:var(--ocean)">View →</a>`:'';
+    return `<div class="hotel-option ${isRec?'recommended':''}">
+      <div class="hotel-header">
+        <div>
+          <div class="hotel-name">${h.name}${isRec?'<span class="rec-chip" style="background:var(--sun)">Recommended</span>':''}</div>
+          ${stars?`<div class="hotel-stars">${stars}</div>`:''}
+        </div>
+        <div class="hotel-price">${price}</div>
+      </div>
+      <div class="hotel-meta">${meta} ${url}</div>
+      ${amenities?`<div class="hotel-amenities">${amenities}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── Places renderer ───────────────────────────────────────────────────────
+function renderPlaces(pd) {
+  if (!pd || !pd.places) return;
+  document.getElementById('placesCard').style.display = 'block';
+  const isLive = (pd.data_source||'').toLowerCase().includes('live') || (pd.data_source||'').toLowerCase().includes('serper');
+  document.getElementById('placesLiveBadge').textContent = isLive ? '● LIVE' : 'Demo data';
+  const catIcons  = { beaches:'🏖', sightseeing:'🏛', nightlife:'🎉', food_spots:'🍽', indoor_activities:'🏛' };
+  const catLabels = { beaches:'Beaches', sightseeing:'Sightseeing', nightlife:'Nightlife', food_spots:'Food & Restaurants', indoor_activities:'Indoor Activities' };
+  let html = '';
+  for (const [cat, items] of Object.entries(pd.places)) {
+    if (!items||!items.length) continue;
+    html += `<div class="places-section"><div class="places-cat-title">${catIcons[cat]||'📌'} ${catLabels[cat]||cat}</div>`;
+    items.forEach(p => {
+      const tip   = p.tip||p.snippet||p.must_try||p.details||'';
+      const extra = p.price ? ` · ${p.price}` : p.best_time ? ` · Best: ${p.best_time}` : '';
+      const link  = p.source_url ? `<a href="${p.source_url}" target="_blank" style="font-size:10px;color:var(--ocean)"> ↗</a>` : '';
+      html += `<div class="place-item">
+        <div class="place-emoji">${catIcons[cat]||'📌'}</div>
+        <div><div class="place-name">${p.name||p.title||'—'}${link}</div>
+        <div class="place-tip">${tip}${extra}</div></div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  if (pd.pro_tips&&pd.pro_tips.length) {
+    html += `<div style="margin-top:10px;padding:10px 12px;background:#f8fafc;border-radius:10px;">
+      <div class="places-cat-title">💡 Pro Tips</div>
+      ${pd.pro_tips.map(t=>`<div style="font-size:11px;color:#556;padding:3px 0">• ${t}</div>`).join('')}</div>`;
+  }
+  document.getElementById('placesContent').innerHTML = html;
+}
+
+// ── Itinerary renderer ────────────────────────────────────────────────────
+function renderItinerary(itin) {
+  if (!itin||!itin.days||!itin.days.length) return;
+  document.getElementById('itinCard').style.display = 'block';
+  document.getElementById('itinSummary').textContent = itin.summary || '';
+  document.getElementById('itinDays').innerHTML = itin.days.map(day => {
+    const acts = (day.activities||[]).map(a => `
+      <div class="itin-activity">
+        <div class="itin-time">${a.time||''}</div>
+        <div class="itin-act-body">
+          <div class="itin-act-name">${a.activity||''}</div>
+          <div class="itin-act-loc">${a.location||''} ${a.duration?'· '+a.duration:''} ${a.cost?`<span class="itin-act-cost">· ${a.cost}</span>`:''}</div>
+          ${a.tip?`<div class="itin-act-tip">💡 ${a.tip}</div>`:''}
+        </div>
+      </div>`).join('');
+    const mealsHtml = Object.entries(day.meals||{}).map(([k,v])=>
+      `<div class="itin-meal"><span>${k.charAt(0).toUpperCase()+k.slice(1)}:</span> ${v}</div>`).join('');
+    return `<div class="itin-day">
+      <div class="itin-day-header">
+        <div class="itin-day-num">${day.day}</div>
+        <div class="itin-day-theme">${day.theme||'Day '+day.day}</div>
+        ${day.daily_budget?`<div class="itin-day-budget">${day.daily_budget}</div>`:''}
+      </div>
+      ${acts}
+      ${mealsHtml?`<div class="itin-meals">${mealsHtml}</div>`:''}
+    </div>`;
+  }).join('');
+  let extras = '';
+  const pack = itin.packing_checklist||[];
+  if (pack.length) extras += `<div style="margin-top:20px">
+    <div class="detail-card-title" style="font-size:13px">🎒 Packing Checklist</div>
+    <div class="packing-grid">${pack.map(i=>`<span class="pack-item">${i}</span>`).join('')}</div></div>`;
+  const emerg = itin.emergency_contacts||{};
+  if (Object.keys(emerg).length) extras += `<div style="margin-top:16px">
+    <div class="detail-card-title" style="font-size:13px">🆘 Emergency Contacts</div>
+    <div class="emergency-grid">${Object.entries(emerg).map(([k,v])=>
+      `<div class="emerg-item"><strong>${k}</strong>${v}</div>`).join('')}</div></div>`;
+  document.getElementById('itinExtras').innerHTML = extras;
+}
+
+function showResults(data, payload) {
+  const card = document.getElementById('resultsCard');
+  card.style.display = 'block';
+
+  const badge = document.getElementById('reviewBadge');
+  const status = data.review || 'pending';
+  badge.className = 'badge ' + (status === 'approved' ? 'approved' : status === 'needs_retry' ? 'retry' : 'pending');
+  badge.textContent = status === 'approved' ? '✅ Approved' : status === 'needs_retry' ? '⚠ Needs Retry' : '⏳ Pending';
+
+  const bud = data.budget || {};
+  const estimated   = bud.estimated_total || 0;
+  const totalBudget = bud.total_budget || parseFloat(payload.budget) || 1;
+  const pct = Math.min((estimated / totalBudget * 100), 120).toFixed(1);
+  const isOver = estimated > totalBudget;
+
+  document.getElementById('resultGrid').innerHTML = `
+    <div class="result-box"><div class="rb-label">Total Budget</div><div class="rb-value">₹${totalBudget.toLocaleString('en-IN')}</div></div>
+    <div class="result-box"><div class="rb-label">Estimated Cost</div><div class="rb-value ${isOver ? 'red' : 'green'}">₹${estimated.toLocaleString('en-IN')}</div></div>
+    <div class="result-box"><div class="rb-label">Hotel</div><div class="rb-value" style="font-size:12px">${data.hotel || 'N/A'}</div></div>
+    <div class="result-box"><div class="rb-label">Transport</div><div class="rb-value" style="font-size:12px">${(data.transport || 'N/A').slice(0, 40)}</div></div>
+    <div class="result-box"><div class="rb-label">Weather</div><div class="rb-value amber" style="font-size:12px">${(data.weather||{}).summary || 'N/A'}</div></div>
+    <div class="result-box"><div class="rb-label">Itinerary</div><div class="rb-value" style="font-size:12px">${data.itinerary_title || 'N/A'}</div></div>
+  `;
+
+  document.getElementById('budgetPct').textContent = pct + '%';
+  const bar = document.getElementById('budgetBar');
+  bar.style.width = pct + '%';
+  bar.className = 'budget-bar' + (isOver ? ' over' : '');
+
+  const logCard = document.getElementById('logCard');
+  logCard.style.display = 'block';
+  const logBox = document.getElementById('logBox');
+  logBox.innerHTML = (data.messages || []).map(m => `<div class="log-line">${m}</div>`).join('');
+  logBox.scrollTop = logBox.scrollHeight;
+
+  if (data.pdf_status === 'generated') {
+    document.getElementById('downloadBtn').classList.remove('hidden');
+  }
+
+  // ── Weather + Budget Breakdown ────────────────────────────────────────
+  renderWeatherBudget(data);
+
+  // ── Transport Details ─────────────────────────────────────────────────
+  renderTransport(data.transport_data);
+  showHubAsk(data.transport_data, data.places_data);
+
+  // ── Hotel Details ─────────────────────────────────────────────────────
+  renderHotels(data.hotel_data);
+
+  // ── Places Details ────────────────────────────────────────────────────
+  renderPlaces(data.places_data);
+
+  // ── Itinerary ─────────────────────────────────────────────────────────
+  renderItinerary(data.itinerary);
+
+  // ── Guardrail warnings ────────────────────────────────────────────────
+  const warnBox = document.getElementById('guardrailWarn');
+  if (data.warnings && data.warnings.length) {
+    warnBox.style.display = 'block';
+    warnBox.innerHTML = data.warnings.map(w =>
+      `<div class="guardrail-warn">⚠ ${w}</div>`
+    ).join('');
+  } else {
+    warnBox.style.display = 'none';
+  }
+
+  // ── Evaluation Scorecard ──────────────────────────────────────────────
+  const ev = data.evaluation || {};
+  if (ev.total_score !== undefined) {
+    document.getElementById('evalCard').style.display = 'block';
+    const score = ev.total_score || 0;
+    const grade = ev.grade || 'N/A';
+
+    // Score ring animation
+    document.getElementById('evalScoreNum').textContent = score;
+    const circumference = 2 * Math.PI * 30; // 188.5
+    const offset = circumference - (score / 100) * circumference;
+    const ring = document.getElementById('ringVal');
+    setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+    const ringColor = score >= 90 ? '#00c864' : score >= 75 ? '#00b4ff' : score >= 60 ? '#ffb400' : '#ff5050';
+    ring.setAttribute('stroke', ringColor);
+
+    // Grade badge
+    const gradeEl = document.getElementById('evalGrade');
+    gradeEl.textContent = grade;
+    gradeEl.className = 'eval-grade ' +
+      (grade === 'Excellent' ? 'grade-excellent' :
+       grade === 'Good'      ? 'grade-good'      :
+       grade === 'Fair'      ? 'grade-fair'       : 'grade-poor');
+
+    // Breakdown bars
+    const catColors = {
+      budget_fit: '#00c864', completeness: '#00b4ff',
+      weather_match: '#a78bfa', data_quality: '#ffb400', transport_fit: '#ff7043'
+    };
+    const catLabels = {
+      budget_fit: 'Budget Fit', completeness: 'Completeness',
+      weather_match: 'Weather Match', data_quality: 'Data Quality', transport_fit: 'Transport Fit'
+    };
+    const bd = ev.breakdown || {};
+    document.getElementById('evalBars').innerHTML = Object.entries(bd).map(([key, v]) => {
+      const pct = Math.round((v.score / v.max) * 100);
+      const color = catColors[key] || '#aac';
+      return `<div class="eval-row">
+        <div class="eval-row-label">${catLabels[key] || key}</div>
+        <div class="eval-row-bar-wrap"><div class="eval-row-bar" style="width:${pct}%;background:${color}"></div></div>
+        <div class="eval-row-pts">${v.score}/${v.max}</div>
+        <div class="eval-row-note">${v.note || ''}</div>
+      </div>`;
+    }).join('');
+
+    // Recommendations
+    const recs = ev.recommendations || [];
+    if (recs.length) {
+      document.getElementById('evalRecs').style.display = 'block';
+      document.getElementById('evalRecsList').innerHTML = recs.map(r =>
+        `<div class="eval-rec">${r}</div>`
+      ).join('');
+    }
+  }
+}
+</script>
+
+<!-- ── Trippy Chatbot JS ──────────────────────────────────────────────────── -->
+<script>
+(function() {
+  let chatOpen    = false;
+  let chatHistory = [];          // [{role, content}]
+  let extractedData = {};        // structured data returned by LLM
+  let badgeDismissed = false;
+
+  // ── Open / close ──────────────────────────────────────────────────────────
+  window.toggleChat = function() {
+    chatOpen = !chatOpen;
+    document.getElementById('chatWindow').classList.toggle('open', chatOpen);
+    document.getElementById('chatToggleIcon').textContent = chatOpen ? '✕' : '💬';
+    if (chatOpen) {
+      if (!badgeDismissed) {
+        document.getElementById('chatBadge').style.display = 'none';
+        badgeDismissed = true;
+      }
+      if (chatHistory.length === 0) sendWelcome();
+      setTimeout(() => document.getElementById('chatInput').focus(), 200);
+    }
+  };
+
+  // ── Welcome message ────────────────────────────────────────────────────────
+  function sendWelcome() {
+    const welcome = "Hi! I'm Trippy 🌴 Planning a trip? Tell me where you'd like to go and I'll help you build the perfect itinerary. \n\nWhere are you travelling **from**, and where do you want to **go**?";
+    appendMessage('bot', welcome);
+    chatHistory.push({ role: 'assistant', content: welcome });
+  }
+
+  // ── Send user message ──────────────────────────────────────────────────────
+  window.sendChatMessage = function() {
+    const input = document.getElementById('chatInput');
+    const text  = input.value.trim();
+    if (!text) return;
+    input.value = '';
+
+    appendMessage('user', text);
+    chatHistory.push({ role: 'user', content: text });
+    showTyping();
+
+    fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory }),
+    })
+    .then(r => r.json())
+    .then(d => {
+      removeTyping();
+      const reply = d.reply || 'Sorry, something went wrong.';
+      appendMessage('bot', reply);
+      chatHistory.push({ role: 'assistant', content: reply });
+
+      if (d.extracted && Object.keys(d.extracted).length > 0) {
+        extractedData = d.extracted;
+        document.getElementById('fillFormBar').style.display = 'block';
+      }
+      scrollToBottom();
+    })
+    .catch(() => {
+      removeTyping();
+      appendMessage('bot', 'Oops — connection error. Please try again.');
+    });
+  };
+
+  // ── Fill form with extracted data ──────────────────────────────────────────
+  window.fillFormFromChat = function() {
+    const d = extractedData;
+    if (!d || !Object.keys(d).length) return;
+
+    const setVal = (id, val) => {
+      if (val == null || val === '') return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = val;
+      el.dispatchEvent(new Event('change'));
+    };
+
+    // Text / number fields
+    if (d.source)       setVal('source',       d.source);
+    if (d.destination)  setVal('destination',  d.destination);
+    if (d.num_days)     setVal('num_days',      d.num_days);
+    if (d.num_travelers)setVal('num_travelers', d.num_travelers);
+    if (d.budget)       setVal('budget',        d.budget);
+
+    // Selects
+    if (d.travel_type)      setVal('travel_type',      d.travel_type);
+    if (d.luxury_or_budget) setVal('luxury_or_budget', d.luxury_or_budget);
+    if (d.transport_pref)   setVal('transport_pref',   d.transport_pref);
+    if (d.food_pref)        setVal('food_pref',         d.food_pref);
+
+    // Hotel pref select — match by value or partial text
+    if (d.hotel_pref) {
+      const hSel = document.getElementById('hotel_pref');
+      if (hSel) {
+        const lower = d.hotel_pref.toLowerCase();
+        let matched = false;
+        for (const opt of hSel.options) {
+          if (opt.value.toLowerCase().includes(lower) || lower.includes(opt.value.toLowerCase())) {
+            hSel.value = opt.value;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched && hSel.options.length) hSel.value = hSel.options[0].value;
+      }
+    }
+
+    // Travel dates — use the flatpickr instances stored as ._fp
+    if (d.travel_dates) {
+      const parts = d.travel_dates.split(' to ');
+      const fpFrom = document.getElementById('date_from')?._fp;
+      const fpTo   = document.getElementById('date_to')?._fp;
+      if (fpFrom && parts[0]) fpFrom.setDate(parts[0], true);
+      if (fpTo   && parts[1]) fpTo.setDate(parts[1], true);
+      // Also set the hidden field directly so submit always has it
+      const hiddenEl = document.getElementById('travel_dates');
+      if (hiddenEl) hiddenEl.value = d.travel_dates;
+    }
+    // Ensure num_days reflects the chatbot's answer (flatpickr onChange may overwrite it)
+    if (d.num_days) {
+      setTimeout(() => { setVal('num_days', d.num_days); }, 50);
+    }
+
+    // Must-visit places
+    if (d.must_visit_places) {
+      setVal('must_visit_places', d.must_visit_places);
+      renderMustVisitTags(d.must_visit_places);
+    }
+
+    // Interests — clear all, activate matching ones
+    if (d.places_interest && d.places_interest.length) {
+      document.querySelectorAll('.interest-btn').forEach(btn => btn.classList.remove('active'));
+      d.places_interest.forEach(interest => {
+        const btn = document.querySelector(`.interest-btn[data-val="${interest}"]`);
+        if (btn) btn.classList.add('active');
+      });
+    }
+
+    // Sync dependent UI
+    if (window.autoUpdateRooms)   autoUpdateRooms();
+    if (window.updateSeatOptions) updateSeatOptions();
+
+    // Close chatbot, scroll to form
+    toggleChat();
+    setTimeout(() => {
+      document.querySelector('.form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+
+    showFillToast(d.destination);
+  };
+
+  function renderMustVisitTags(csv) {
+    const wrap = document.getElementById('mustVisitTags');
+    if (!wrap) return;
+    const places = csv.split(',').map(p => p.trim()).filter(Boolean);
+    if (!places.length) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'flex';
+    wrap.innerHTML = places.map(p =>
+      `<span style="background:#e0f4ff;color:#0077a8;border:1px solid #b3e0f7;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;">📍 ${p}</span>`
+    ).join('');
+  }
+
+  function showFillToast(dest) {
+    const t = document.createElement('div');
+    t.textContent = `Form filled for ${dest || 'your trip'}! Review and click Plan My Trip.`;
+    Object.assign(t.style, {
+      position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+      background:'#22c55e', color:'#fff', padding:'12px 22px', borderRadius:'30px',
+      fontSize:'13px', fontWeight:'600', zIndex:'99999',
+      boxShadow:'0 4px 20px rgba(0,0,0,.2)', whiteSpace:'nowrap',
+    });
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  // ── DOM helpers ────────────────────────────────────────────────────────────
+  function appendMessage(role, text) {
+    const box = document.getElementById('chatMessages');
+    const row = document.createElement('div');
+    row.className = `msg-row ${role}`;
+
+    if (role === 'bot') {
+      row.innerHTML = `<div class="msg-bot-icon">🌴</div><div class="msg-bubble">${markdownLite(text)}</div>`;
+    } else {
+      row.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div>`;
+    }
+    box.appendChild(row);
+    scrollToBottom();
+  }
+
+  function showTyping() {
+    const box = document.getElementById('chatMessages');
+    const el  = document.createElement('div');
+    el.id = 'typingIndicator';
+    el.className = 'msg-row bot';
+    el.innerHTML = `<div class="msg-bot-icon">🌴</div><div class="msg-bubble msg-typing"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+    box.appendChild(el);
+    scrollToBottom();
+  }
+
+  function removeTyping() {
+    document.getElementById('typingIndicator')?.remove();
+  }
+
+  function scrollToBottom() {
+    const box = document.getElementById('chatMessages');
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function escHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function markdownLite(t) {
+    return escHtml(t)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
+
+  // Show badge on load to invite users
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (!chatOpen && !badgeDismissed) {
+        document.getElementById('chatBadge').style.display = 'flex';
+      }
+    }, 1500);
+  });
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+(function() {
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  function updateHidden() {
+    const fromEl = document.getElementById('date_from');
+    const toEl   = document.getElementById('date_to');
+    const hidden = document.getElementById('travel_dates');
+    if (fromEl._fp && toEl._fp) {
+      const d1 = fromEl._fp.selectedDates[0];
+      const d2 = toEl._fp.selectedDates[0];
+      if (d1 && d2) {
+        const m1 = MONTHS[d1.getMonth()]; const day1 = d1.getDate(); const y1 = d1.getFullYear();
+        const m2 = MONTHS[d2.getMonth()]; const day2 = d2.getDate(); const y2 = d2.getFullYear();
+        if (m1 === m2 && y1 === y2) {
+          hidden.value = `${m1} ${day1}-${day2}, ${y1}`;
+        } else {
+          hidden.value = `${m1} ${day1} – ${m2} ${day2}, ${y2}`;
+        }
+        // Auto-fill num_days
+        const diff = Math.round((d2 - d1) / 86400000);
+        if (diff > 0) document.getElementById('num_days').value = diff;
+      }
+    }
+  }
+
+  const today = new Date();
+  const minDate = today.toISOString().slice(0,10);
+
+  const fpFrom = flatpickr('#date_from', {
+    minDate: minDate,
+    dateFormat: 'D, d M Y',
+    disableMobile: true,
+    onChange: function(selectedDates) {
+      if (selectedDates[0]) {
+        fpTo.set('minDate', selectedDates[0]);
+      }
+      updateHidden();
+    }
+  });
+  document.getElementById('date_from')._fp = fpFrom;
+
+  const fpTo = flatpickr('#date_to', {
+    minDate: minDate,
+    dateFormat: 'D, d M Y',
+    disableMobile: true,
+    onChange: function(selectedDates) {
+      if (selectedDates[0]) {
+        fpFrom.set('maxDate', selectedDates[0]);
+      }
+      updateHidden();
+    }
+  });
+  document.getElementById('date_to')._fp = fpTo;
+
+  // Set default dates (today + 10 days as example)
+  const defFrom = new Date(); defFrom.setDate(defFrom.getDate() + 30);
+  const defTo   = new Date(); defTo.setDate(defTo.getDate() + 35);
+  fpFrom.setDate(defFrom);
+  fpTo.setDate(defTo);
+})();
+
+// ── Weather Warning Modal ─────────────────────────────────────────────────
+function showWeatherWarning(warning) {
+  return new Promise(resolve => {
+    document.getElementById('weatherWarnMsg').textContent = warning.message;
+    document.getElementById('weatherWarnSummary').textContent =
+      `Condition: ${warning.summary} · Temp max: ${warning.temp_max}°C · Rain risk: ${warning.risk}`;
+    // Swap icon and title based on type
+    const icons  = { 'rain': '⛈️', 'heat': '🥵', 'rain+heat': '🌡️', 'none': '⚠️' };
+    const titles = { 'rain': 'Heavy Rain Warning', 'heat': 'Extreme Heat Warning',
+                     'rain+heat': 'Rain + Extreme Heat Warning', 'none': 'Weather Warning' };
+    document.querySelector('#weatherWarnModal div div:first-child').textContent =
+      icons[warning.type] || '⚠️';
+    document.querySelector('#weatherWarnModal .warn-title').textContent =
+      titles[warning.type] || 'Weather Warning';
+    const modal = document.getElementById('weatherWarnModal');
+    modal.style.display = 'flex';
+    document.getElementById('weatherWarnProceed').onclick = () => {
+      modal.style.display = 'none'; resolve(true);
+    };
+    document.getElementById('weatherWarnBack').onclick = () => {
+      modal.style.display = 'none'; resolve(false);
+    };
+  });
+}
+
+// ── Budget Exceeded Modal ──────────────────────────────────────────────────
+function showBudgetExceeded(info) {
+  return new Promise(resolve => {
+    document.getElementById('budgetExcMsg').textContent = info.message;
+    const modal = document.getElementById('budgetExcModal');
+    modal.style.display = 'flex';
+    document.getElementById('budgetExcOk').onclick = () => {
+      modal.style.display = 'none'; resolve();
+    };
+  });
+}
+
+// ── No Tickets Modal ──────────────────────────────────────────────────────
+function showNoTickets(info) {
+  document.getElementById('noTicketsMsg').textContent = info.message;
+  document.getElementById('noTicketsModal').style.display = 'flex';
+  document.getElementById('noTicketsOk').onclick = () => {
+    document.getElementById('noTicketsModal').style.display = 'none';
+  };
+}
+</script>
+
+<!-- ── Weather Warning Modal ───────────────────────────────────────────── -->
+<div id="weatherWarnModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+    <div style="font-size:52px;margin-bottom:12px;">⛈️</div>
+    <div class="warn-title" style="font-size:20px;font-weight:700;color:#c0392b;margin-bottom:10px;">Weather Alert</div>
+    <div id="weatherWarnMsg" style="font-size:14px;color:#444;margin-bottom:8px;line-height:1.6;"></div>
+    <div id="weatherWarnSummary" style="font-size:12px;color:#888;margin-bottom:24px;"></div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button id="weatherWarnBack" style="padding:10px 28px;border-radius:30px;border:2px solid #ccc;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#666;">← Go Back</button>
+      <button id="weatherWarnProceed" style="padding:10px 28px;border-radius:30px;border:none;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Proceed Anyway →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Budget Exceeded Modal ────────────────────────────────────────────── -->
+<div id="budgetExcModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+    <div style="font-size:52px;margin-bottom:12px;">💸</div>
+    <div style="font-size:20px;font-weight:700;color:#e67e22;margin-bottom:10px;">Budget Exceeded</div>
+    <div id="budgetExcMsg" style="font-size:14px;color:#444;margin-bottom:24px;line-height:1.6;"></div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px;">We already tried cheaper hotel &amp; transport options — this is the best available.</div>
+    <button id="budgetExcOk" style="padding:10px 36px;border-radius:30px;border:none;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">OK, I Understand</button>
+  </div>
+</div>
+
+<!-- ── Trippy Chatbot Widget ─────────────────────────────────────────────── -->
+<button id="chatToggleBtn" onclick="toggleChat()" title="Chat with Trippy">
+  <span id="chatToggleIcon">💬</span>
+  <span id="chatBadge">1</span>
+</button>
+
+<div id="chatWindow">
+  <div class="chat-header">
+    <div class="chat-avatar">🌴</div>
+    <div class="chat-header-info">
+      <div class="chat-header-title">Trippy</div>
+      <div class="chat-header-sub">AI Trip Planning Assistant</div>
+    </div>
+    <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+  </div>
+
+  <div id="chatMessages"></div>
+
+  <div id="fillFormBar" style="display:none">
+    <button id="fillFormBtn" onclick="fillFormFromChat()">✈️ Fill the Form with My Details</button>
+  </div>
+
+  <div class="chat-input-wrap">
+    <input id="chatInput" placeholder="Tell me about your trip…" autocomplete="off"
+      onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendChatMessage();}"/>
+    <button id="chatSendBtn" onclick="sendChatMessage()">&#10148;</button>
+  </div>
+</div>
+
+<!-- ── No Tickets Modal ──────────────────────────────────────────────────── -->
+<div id="noTicketsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:18px;padding:32px 28px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+    <div style="font-size:52px;margin-bottom:12px;">🎫</div>
+    <div style="font-size:20px;font-weight:700;color:#2c3e50;margin-bottom:10px;">No Tickets Available</div>
+    <div id="noTicketsMsg" style="font-size:14px;color:#444;margin-bottom:24px;line-height:1.6;"></div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px;">Try changing the transport mode or travel dates.</div>
+    <button id="noTicketsOk" style="padding:10px 36px;border-radius:30px;border:none;background:linear-gradient(135deg,#2c3e50,#3d566e);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">OK</button>
+  </div>
+</div>
+
+</body>
+</html>
