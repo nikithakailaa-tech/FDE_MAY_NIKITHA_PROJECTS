@@ -1,5 +1,7 @@
 # AI-Powered Product Strategy Assistant
 
+**🚀 Live Application:** [https://fde-may-nikitha-projects-4.onrender.com/](https://fde-may-nikitha-projects-4.onrender.com/)
+
 A multi-agent AI system that helps Product Managers analyze business data, generate strategic insights, and make data-driven decisions.
 
 ## Architecture
